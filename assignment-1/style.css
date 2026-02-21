@@ -30,23 +30,32 @@ html , body{
 .logo{
     width: 100px;
     background-color: transparent;
-    margin-left: 10px;
+    margin-left: 15px;
     margin-top: 5px;
     position: relative;
     padding-top: 5px;
 }
 
 
-.nav-list , .nav-list li{
+.nav-list, .nav-list-item{
     background-color: white;
     display: flex;
     list-style: none;
-    padding-top: 5px;
+    padding-top: 7px;
     gap: 20px;
     text-align: center;
     text-decoration-color: black;
+    text-decoration-line: none;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 12px;
+}
+
+.nav-list-item{
+    text-decoration-line: none;
+    text-align: center;
+    justify-content: center;
+    text-decoration-color:none;
+    color:black;
 }
 
 .navdiv-icons{
@@ -58,8 +67,42 @@ html , body{
 }
 
 .nav-icons{
+    margin-left: 10px;
     width: 25px;
     gap: 10px;
 }
 
+.carousel-imgs{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.carousel-img{
+    width: 100%;
+}
+
+.top-picks-container{
+    align-items: center;
+    justify-content: center;
+}
+
+.top-picks{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 30px;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.top-picks-text{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.top-picks-img{
+    width: 100%;
+    margin-top: 15px;
+}
 
