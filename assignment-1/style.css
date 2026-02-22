@@ -107,6 +107,41 @@ html , body{
     gap: 15px;
 }
 
+ .submenu-newin-list{
+    display: none;
+
+}
+
+.div-submenu-newin{
+    position: relative;
+    width:100px;
+}
+
+.submenu-newin-item{
+    display: flex;
+    list-style: none;
+    width: 150px;
+    padding: 5px;
+    text-align: left;
+    color: black;
+    text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+
+}
+
+.nav-list-item:hover .submenu-newin-list{
+     display: block;
+     background-color: white;
+     position: absolute;
+     padding: 10px;
+     margin-top: 30px;
+     margin-left: -20px;
+     border: 1px solid #ccc;
+   
+}
+
+
 .div-carousel-imgs{
     display: flex;
     justify-content: center;
@@ -179,6 +214,7 @@ html , body{
     height: auto;
     gap: 160px;
     margin-top: 20px;
+    margin-left: 70px;
 }
 
 
@@ -190,11 +226,15 @@ html , body{
     margin-top: 10px;
 }
 
+
 .li-footer-help a, .li-footer-more a, .li-footer-socials a{
     text-decoration: none;
     color: black;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: lighter;
+    line-height: 30px;
 }
-
 
 
 .div-end-footer{
@@ -245,7 +285,7 @@ h4{
 }
 
 .cpyright-txt{
-    padding-top: 25px;
+    padding-top: 15px;
     font-size: 11px;
     color: grey;
     font-weight: lighter;
