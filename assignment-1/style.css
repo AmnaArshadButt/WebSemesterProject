@@ -2,6 +2,11 @@ html , body{
     margin:0
 }
 
+*{
+    font-family: Arial, Helvetica, sans-serif;
+    list-style:  none;
+}
+
 .divbar{
     background-color: #b4cddc;
     font-family: Arial, Helvetica, sans-serif;
@@ -105,27 +110,45 @@ html , body{
     width: 100%;
 }
 
-.top-picks-container{
+.top-picks-container, .best-seller-container{
     align-items: center;
     justify-content: center;
 }
 
-.top-picks{
+.top-picks,.best-sellers{
     font-family: Arial, Helvetica, sans-serif;
     font-size: 30px;
     text-align: center;
     margin-top: 30px;
 }
 
-.top-picks-text{
+.top-picks-text,.best-sellers-text{
     font-family: Arial, Helvetica, sans-serif;
     font-size: 20px;
     text-align: center;
     margin-top: 10px;
 }
 
-.top-picks-img{
+.top-picks-img, .best-seller-img{
     width: 100%;
     margin-top: 15px;
 }
+
+.div-logo-nav{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff9f5;
+    margin-top: 20px;
+    
+}
+
+.ul-list-logo{
+    display: flex;
+    list-style:none;
+    gap: 180px;
+    margin-top: 20px;
+    padding-top: 30px;
+}
+
 
