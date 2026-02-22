@@ -73,16 +73,23 @@ html , body{
    
 }
 
-.nav-list-item{
-    color: black;}
-
-
-.nav-list-item2{
-    color: #d5af37
+.nav-list-item a{
+    color: black;
+    text-decoration: none;
+    
 }
 
-.nav-list-item6{
+
+.nav-list-item2 a{
+    color: #d5af37 ;
+    text-decoration: none;
+   
+}
+
+.nav-list-item6 a{
     color:#fd6500;
+    text-decoration: none;
+
 }
 
 .navdiv-icons{
@@ -151,4 +158,95 @@ html , body{
     padding-top: 30px;
 }
 
+.list-logo a{
+    text-decoration: none;
+    color: black;
 
+}
+
+.div-help{
+    display: flex;
+    margin-top: 10px;
+    padding-top: 20px;
+}
+
+.div-faq{
+    justify-content: flex-end;
+}
+
+.div-footer{
+    display: flex;
+    height: auto;
+    gap: 160px;
+    margin-top: 20px;
+}
+
+
+.ul-footer-help,.ul-footer-more,.ul-footer-socials {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    list-style: none;
+    gap: 60px;
+    margin-top: 10px;
+}
+
+.li-footer-help a, .li-footer-more a, .li-footer-socials a{
+    text-decoration: none;
+    color: black;
+}
+
+
+
+.div-end-footer{
+    display: flex;
+    height: auto;
+    margin-top: 8px;
+    margin-bottom: 40px;
+    margin-left: 70px;
+    gap:50px;
+}
+
+h4{
+    font-size: 14px;
+    font-weight: lighter;
+    color: grey;
+}
+
+.div-pay,.div-securedby{
+    
+    padding-right: 50px;
+    padding-left: 30px;
+    gap: 30px;
+    margin-left: 10px;
+}
+
+.div-khaddilogo{
+    display: flex;
+    padding-right: 50px;
+    padding-left: 20px;
+    padding-top: 15px;
+    gap: 25px;
+    margin-left: 10px;
+}
+
+.imgpay{
+    width: 70px;
+    height: auto;
+}
+
+.imgpay-union{
+    width: 50px;
+    height: auto;
+}
+
+.img-khaddilogo{
+    width: 60px;
+    height: auto;
+}
+
+.cpyright-txt{
+    padding-top: 25px;
+    font-size: 11px;
+    color: grey;
+    font-weight: lighter;
+}
