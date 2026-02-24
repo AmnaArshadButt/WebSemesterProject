@@ -112,19 +112,11 @@ html , body{
 
 }
 
-
-.submenu-newin-item{
-    display: flex;
-    flex-direction: row;
-    list-style: none;
-    width: 100px;
-    height: 300px;
-    text-align: left;
-    color: black;
-    text-decoration: none;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 12px;
-    position: relative;
+.div-img{
+    width: 200px;
+    gap: 25px;
+    margin-top: 10px;
+    margin-bottom: 15px;
 }
 
 .submenu-newin img{
