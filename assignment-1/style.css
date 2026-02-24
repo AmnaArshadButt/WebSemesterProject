@@ -7,6 +7,12 @@ html , body{
     list-style:  none;
 }
 
+h3:hover{
+text-decoration: underline;
+}
+
+
+
 .divbar{
     background-color: #b4cddc;
     font-family: Arial, Helvetica, sans-serif;
@@ -67,7 +73,6 @@ html , body{
 }
 
 .nav-list-item, .nav-list-item2, .nav-list-item6{
-    text-decoration: none;
     text-align: center;
     justify-content: center;
    
@@ -107,7 +112,8 @@ html , body{
     gap: 15px;
 }
 
- .submenu-newin-list{
+ .submenu-newin-list,.submenu-ramadan-list,.submenu-sales-list{
+
     display: none;
 
 }
@@ -119,25 +125,45 @@ html , body{
     margin-bottom: 15px;
 }
 
-.submenu-newin img{
+ .submenu-newin-img{
     display: flex;
     width: 180px;
     gap: 10px;
     margin-top: 10px;
     margin-left: 10px;
     position: relative;
+ 
 }
 
 .nav-list-item:hover .submenu-newin-list{
      display: flex;
-     flex-direction: row;
      background-color: white;
      position: absolute;
      padding: 5px;
      margin-top: 12px;
      margin-left: -50px;
+   
+}
 
-     
+.nav-list-item2:hover .submenu-ramadan-list{
+    display: flex;
+    background-color: white;
+    position: absolute;
+    padding: 5px;
+    margin-top: 12px;
+    margin-left: -50px;
+    
+}
+
+.nav-list-item6:hover .submenu-sales-list{
+    display: flex;
+    background-color: white;
+    position: absolute;
+    padding: 5px;
+    margin-top: 12px;
+    margin-right: 100px;
+    margin-left: -400px;
+    
 }
 
 
