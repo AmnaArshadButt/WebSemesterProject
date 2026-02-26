@@ -112,7 +112,7 @@ text-decoration: underline;
     gap: 15px;
 }
 
- .submenu-newin-list,.submenu-ramadan-list,.submenu-sales-list,.submenu-fragnance{
+ .submenu-newin-list,.submenu-ramadan-list,.submenu-sales-list,.submenu-fragnance,.submenu-fabrics{
 
     display: none;
 
@@ -176,13 +176,34 @@ text-decoration: underline;
     
 }
 
-.div-frag-submenu{
-    display: grid;
+.nav-list-item:hover .submenu-fabrics{
+    display: flex;
+    background-color: white;
+    position: absolute;
+    padding: 5px;
+    margin-top: 12px;
+    margin-left: -50px;
+    
+}
+
+.div-fabrics-submenu-2,.div-fabrics-submenu{
+    display: flex;
+    flex-direction: column;
     width: 180px;
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 30px;
     margin-left: 10px;
-    position: relative;
+    position:relative;
+}
+
+.div-frag-submenu,.div-frag-submenu-2{
+    display: flex;
+    flex-direction: column;
+    width: 180px;
+    gap: 10px;
+    margin-top: 30px;
+    margin-left: 10px;
+    position:relative;
 }
 
 
