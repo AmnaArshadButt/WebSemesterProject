@@ -494,3 +494,37 @@ h4{
     letter-spacing: 1px;
 }
 
+.div-carousel{
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+
+.div-img-container{
+    display: flex;
+    width: max-content;
+  animation: slide 18s infinite linear;
+
+}
+
+.div-img-info{
+   flex: 0 0 300px;   /* card width */
+  margin-right: 20px;
+}
+
+.div-img-info img{
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+
+}
+
+@keyframes slide {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
