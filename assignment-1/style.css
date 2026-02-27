@@ -250,8 +250,6 @@ text-decoration: underline;
 }
 
 
-
-
 .div-signature ul h4,.div-essential-casuals ul h4{
 text-align: left;
 color: black;
@@ -322,12 +320,24 @@ h4:hover{
 
 .div-help{
     display: flex;
-    margin-top: 10px;
-    padding-top: 20px;
+    height: auto;
+    gap: 160px;
+    margin-top: 20px;
+    margin-right: 30px;
+    margin-left: 180px;
+    align-items: left;
+    justify-content: left;
 }
 
 .div-faq{
     justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.div-faq img{
+    width: 40px;
+    height: 40px;
+    margin-right: 5px;
 }
 
 .div-footer{
@@ -335,7 +345,9 @@ h4:hover{
     height: auto;
     gap: 160px;
     margin-top: 20px;
-    margin-left: 70px;
+    margin-right: 30px;
+    align-items: center;
+    justify-content: center;
 }
 
 
@@ -411,3 +423,74 @@ h4{
     color: grey;
     font-weight: lighter;
 }
+
+.div-social-email{
+    margin-left: 20px;
+}
+
+.div-social-icons{
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+    
+}
+
+.social-icon{
+    width: 35px;
+    height: 35px;
+}
+
+.div-footer-help h3:hover, .div-footer-more h3:hover, .div-footer-socials h3:hover,.div-footer-email h3:hover{
+    text-decoration-line: none;
+    
+}
+
+.div-footer-help li:hover, .div-footer-more li:hover, .div-footer-socials li:hover{
+    text-decoration: underline;
+}
+
+.div-footer-email{
+    margin-top: 50px;
+    margin-bottom: 10px;
+    
+}
+
+.div-footer-email h3{
+    font-size: 13px;
+    margin-bottom: 15px;
+}
+
+.div-email-input{
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.email-input{
+    border: none;
+    border-bottom: 1px solid grey;
+    padding: 10px 5px;
+    font-size: 13px;
+    font-family: Arial, Helvetica, sans-serif;
+    width: 180px;
+    background-color: transparent;
+}
+
+.email-input::placeholder{
+    color: grey;
+    font-size: 13px;
+}
+
+.email-btn{
+    background-color: #2d2d2d;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-size: 11px;
+    font-family: Arial, Helvetica, sans-serif;
+    cursor: pointer;
+    margin-left: 10px;
+    letter-spacing: 1px;
+}
+
