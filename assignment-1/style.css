@@ -8,9 +8,6 @@ html , body{
 }
 
 
-
-
-
 .divbar{
     background-color: #b4cddc;
     font-family: Arial, Helvetica, sans-serif;
@@ -40,6 +37,7 @@ html , body{
     height: 80px;
     justify-content: space-between;
     align-items: center;
+    z-index: 2;
 }
 
 .divlogo{
@@ -502,15 +500,31 @@ h4{
 
 
 .div-img-container{
+    margin-top: 15px;
     display: flex;
-    width: max-content;
-  animation: slide 18s infinite linear;
+ 
+  animation: slide 25s infinite linear;
+  z-index: 1;
 
 }
 
+.heart-icon-div{
+    position: absolute;
+    top: 10px;
+    right: 30px;
+    z-index: 2;
+}
+
+.heart-icon-div img{
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
 .div-img-info{
-   flex: 0 0 300px;   /* card width */
+    width: 200px;
   margin-right: 20px;
+  margin-bottom: 10px;;
 }
 
 .div-img-info img{
@@ -519,6 +533,23 @@ h4{
   object-fit: cover;
 
 }
+
+.div-img-info h5{
+color: grey;
+font-weight: lighter;
+}
+
+.div-img-info h2{
+    font-weight: normal;
+    font-size: 14px;
+
+}
+
+.div-img-info p{
+    font-size: 12px;
+    font-weight: bolder;
+}
+
 
 @keyframes slide {
   0% {
