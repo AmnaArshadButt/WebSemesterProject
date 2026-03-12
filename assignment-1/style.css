@@ -509,10 +509,36 @@ h4{
 .div-carousel{
     overflow: hidden;
     position: relative;
-    width: 100%;
-    margin-top: 20px;
-    padding: 0 60px;
-    box-sizing: border-box;
+    width: 90%;
+    left: 5%;
+    right: 5%;
+    margin-top: 10px;
+
+   
+}
+
+.carousel-arrowleft,
+.carousel-arrowright{
+    position: absolute;
+    top: 40%;
+    z-index: 10;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+}
+
+.carousel-arrowleft{
+    left: 10px;
+}
+
+.carousel-arrowright{
+    right: 10px;
+}
+
+.carousel-arrowleft img,
+.carousel-arrowright img{
+    width: 60%;
+    height: 60%;
 }
 
 
@@ -520,8 +546,8 @@ h4{
 .div-img-container{
     margin-top: 15px;
     display: flex;
-
-  animation: slide 25s infinite linear;
+    width:80%;
+  animation: slide 85s infinite linear;
   z-index: 1;
 
 }
@@ -532,7 +558,7 @@ h4{
     position: absolute;
     top: 15px;
     right: 15px;
-    z-index: 1;
+    z-index: 5;
     width: 35px;
     height: 35px;
     background-color: rgba(255, 255, 255, 0.9);
@@ -541,34 +567,43 @@ h4{
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    overflow: hidden;
     box-shadow: 0 1px 4px rgba(0,0,0,0.15);
 }
 
-.heart-icon-div:hover{
-    background-color: rgba(22, 9, 9, 0.95);
-}
 
-.heart-icon-div img{
+
+.heart-icon{
     width: 20px;
     height: 20px;
+    display: block;
+}
+
+.heart-icon-filled{
+    width: 20px;
+    height: 20px;
+    display: none;
+}
+
+.heart-icon-div:hover .heart-icon{
+    display: none;
+}
+
+.heart-icon-div:hover .heart-icon-filled{
+    display: block;
 }
 
 
 
 .div-img-info{
-    width: 200px;
+    width: 250px;
     margin-right: 20px;
     margin-bottom: 10px;
     position: relative;
+    flex-shrink: 0;
 }
 
 .div-img-info img{
   width: 100%;
-  height: 350px;
-  object-fit: cover;
-
 }
 
 .div-img-info h5{
