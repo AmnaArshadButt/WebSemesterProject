@@ -517,18 +517,37 @@ h4{
    
 }
 
+.carousel-arrow-div{
+    
+    width: 100%;
+}
+
+.arrowdiv{
+
+position: relative;
+z-index: 1;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-items: center;
+
+
+}
+
 .carousel-arrowleft,
 .carousel-arrowright{
     position: absolute;
-    top: 40%;
+    top: 200px;
     z-index: 10;
     cursor: pointer;
     width: 40px;
     height: 40px;
+
 }
 
 .carousel-arrowleft{
     left: 10px;
+
 }
 
 .carousel-arrowright{
@@ -539,6 +558,7 @@ h4{
 .carousel-arrowright img{
     width: 60%;
     height: 60%;
+ 
 }
 
 
