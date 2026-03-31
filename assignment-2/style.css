@@ -40,6 +40,40 @@ html , body{
     z-index: 2;
 }
 
+.menu-toggle{
+    display: none;
+    background: transparent;
+    border: 0;
+    width: 44px;
+    height: 44px;
+    padding: 8px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.menu-toggle span{
+    display: block;
+    width: 24px;
+    height: 2px;
+    background-color: #111;
+    transition: transform 0.3s ease, opacity 0.25s ease;
+}
+
+.menu-toggle.is-open span:nth-child(1){
+    transform: translateY(7px) rotate(45deg);
+}
+
+.menu-toggle.is-open span:nth-child(2){
+    opacity: 0;
+}
+
+.menu-toggle.is-open span:nth-child(3){
+    transform: translateY(-7px) rotate(-45deg);
+}
+
 .divlogo{
     width: 100px;
     background-color: transparent;
@@ -1122,20 +1156,59 @@ font-weight: lighter;
 
 }
 
-.navdiv-icons-i {
-    display: block;
-    margin-left: 20px;
-    margin-right: 0px;
-    width: 100px;
+.menu-toggle{
+    display: flex;
+    margin-right: auto;
+    z-index: 42;
 }
 
-.nav-menu.active {
-    display: flex;
+.nav-menu{
     position: absolute;
-    top: 60px;
+    top: 100%;
     left: 0;
-    width: 100%;
-    background: white;
+    right: 0;
+    background: #fff;
+    margin: 0;
+    padding: 0 14px;
+    box-sizing: border-box;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: max-height 0.35s ease, opacity 0.3s ease, transform 0.3s ease;
+    border-top: 1px solid #ececec;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+}
+
+.nav-menu.active{
+    display: block;
+    max-height: calc(100vh - 110px);
+    overflow-y: auto;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.nav-list{
+    display: block;
+    padding: 8px 0 14px;
+    margin: 0;
+}
+
+.nav-list-item,
+.nav-list-item2,
+.nav-list-item6{
+    display: block;
+    text-align: left;
+    padding: 12px 4px;
+    margin: 0;
+    border-bottom: 1px solid #f2f2f2;
+}
+
+.nav-list-item a,
+.nav-list-item2 a,
+.nav-list-item6 a{
+    font-size: 14px;
+    line-height: 1.3;
 }
 
 }

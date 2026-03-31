@@ -1,17 +1,32 @@
 
-const menuIcon = document.querySelector( ".navdiv-icons i");
+const menuToggle = document.querySelector(".menu-toggle");
 const navMenu = document.querySelector(".nav-menu");
+const navLinks = document.querySelectorAll(".nav-menu a");
 
-menuIcon.addEventListener("click", function() {
+if (menuToggle && navMenu) {
+    const closeMenu = () => {
+        navMenu.classList.remove("active");
+        menuToggle.classList.remove("is-open");
+        menuToggle.setAttribute("aria-expanded", "false");
+    };
 
-    navMenu.classList.toggle("active");
+    menuToggle.addEventListener("click", () => {
+        const isOpen = navMenu.classList.toggle("active");
+        menuToggle.classList.toggle("is-open", isOpen);
+        menuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
 
-    if(menuIcon.classList.contains("menu")) {
-        menuIcon.classList.remove("menu");
-        menuIcon.classList.add("cross");
-    } else {
-        menuIcon.classList.remove("cross");
-        menuIcon.classList.add("menu");
-    }
+    navLinks.forEach((link) => {
+        link.addEventListener("click", () => {
+            if (window.innerWidth <= 1000) {
+                closeMenu();
+            }
+        });
+    });
 
-});
+    window.addEventListener("resize", () => {
+        if (window.innerWidth > 1000) {
+            closeMenu();
+        }
+    });
+}
