@@ -1010,7 +1010,7 @@ font-weight: lighter;
 
     .div-img-info{
         width: calc(50vw - 32px);
-        min-width: 210px;
+        min-width: 200px;
         margin-right: 10px;
     }
 
@@ -1137,7 +1137,7 @@ font-weight: lighter;
     }
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1300px) {
 
  .divlogo {
         position: absolute;
@@ -1165,27 +1165,26 @@ font-weight: lighter;
 .nav-menu{
     position: absolute;
     top: 100%;
-    left: 0;
-    right: 0;
+    left: 50%;
+    width: min(92vw, 420px);
+    transform: translateX(-50%);
     background: #fff;
     margin: 0;
-    padding: 0 14px;
+    padding: 0 10px;
     box-sizing: border-box;
     max-height: 0;
     overflow: hidden;
     opacity: 0;
-    transform: translateY(-8px);
-    transition: max-height 0.35s ease, opacity 0.3s ease, transform 0.3s ease;
+    transition: max-height 0.35s ease, opacity 0.3s ease;
     border-top: 1px solid #ececec;
     box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
 }
 
 .nav-menu.active{
     display: block;
-    max-height: calc(100vh - 110px);
+    max-height: calc(100vh - 120px);
     overflow-y: auto;
     opacity: 1;
-    transform: translateY(0);
 }
 
 .nav-list{

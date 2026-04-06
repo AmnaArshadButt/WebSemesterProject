@@ -2,6 +2,7 @@
 const menuToggle = document.querySelector(".menu-toggle");
 const navMenu = document.querySelector(".nav-menu");
 const navLinks = document.querySelectorAll(".nav-menu a");
+const MOBILE_NAV_BREAKPOINT = 1300;
 
 if (menuToggle && navMenu) {
     const closeMenu = () => {
@@ -18,14 +19,14 @@ if (menuToggle && navMenu) {
 
     navLinks.forEach((link) => {
         link.addEventListener("click", () => {
-            if (window.innerWidth <= 1000) {
+            if (window.innerWidth <= MOBILE_NAV_BREAKPOINT) {
                 closeMenu();
             }
         });
     });
 
     window.addEventListener("resize", () => {
-        if (window.innerWidth > 1000) {
+        if (window.innerWidth > MOBILE_NAV_BREAKPOINT) {
             closeMenu();
         }
     });
