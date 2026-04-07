@@ -31,3 +31,37 @@ if (menuToggle && navMenu) {
         }
     });
 }
+
+if (window.jQuery) {
+    $(function () {
+        const grid = $("#featured-deals-grid");
+
+        if (!grid.length) {
+            return;
+        }
+
+        $.ajax({
+            url: "https://fakestoreapi.com/products?limit=4",
+            method: "GET",
+            dataType: "json",
+        })
+            .done(function (products) {
+                const cards = products
+                    .map(function (product) {
+                        return `
+                            <article class="featured-deal-card">
+                                <img src="${product.image}" alt="${product.title}">
+                                <h3>${product.title}</h3>
+                                <p>$${product.price}</p>
+                            </article>
+                        `;
+                    })
+                    .join("");
+
+                grid.html(cards);
+            })
+            .fail(function () {
+                grid.html('<p class="featured-deals-error">Unable to load featured deals.</p>');
+            });
+    });
+}
