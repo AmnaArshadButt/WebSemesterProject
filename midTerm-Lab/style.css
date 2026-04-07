@@ -769,6 +769,76 @@ font-weight: lighter;
     color: #666;
 }
 
+.carousel-loading{
+    width: 100%;
+    text-align: center;
+    color: #666;
+    padding: 30px 0;
+}
+
+.quick-view-btn{
+    width: 100%;
+    border: 1px solid #111;
+    background: #fff;
+    color: #111;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 10px;
+    margin-top: 8px;
+    cursor: pointer;
+}
+
+.quick-view-btn:hover{
+    background: #bd4602;
+    color: #fff;
+}
+
+.quick-view-modal{
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.quick-view-modal.is-open{
+    display: flex;
+}
+
+.quick-view-dialog{
+    width: min(560px, 100%);
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px;
+    position: relative;
+}
+
+.quick-view-close{
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.quick-view-description,
+.quick-view-rating{
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 12px;
+}
+
+body.quick-view-open{
+    overflow: hidden;
+}
+
 
 @keyframes slide {
   0% {
@@ -886,6 +956,15 @@ font-weight: lighter;
 
     .featured-deal-card img{
         height: 180px;
+    }
+
+    .quick-view-btn{
+        font-size: 11px;
+        padding: 7px 9px;
+    }
+
+    .quick-view-dialog{
+        padding: 18px;
     }
 
     .carousel-arrowleft,
