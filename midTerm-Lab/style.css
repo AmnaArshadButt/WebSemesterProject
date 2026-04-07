@@ -602,6 +602,7 @@ justify-items: center;
     margin-top: 15px;
     display: flex;
     width:80%;
+        align-items: stretch;
   animation: slide 85s infinite linear;
   z-index: 1;
 
@@ -651,30 +652,58 @@ justify-items: center;
 
 .div-img-info{
     width: 200px;
+    height: 460px;
     margin-right: 20px;
     margin-bottom: 10px;
     position: relative;
     flex-shrink: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
-.div-img-info img{
+.div-img-info > img{
   width: 100%;
+  height: 240px;
+  object-fit: contain;
+  object-position: center;
+  background: #fafafa;
+  display: block;
+  flex-shrink: 0;
+}
+
+.div-img-info span{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
 }
 
 .div-img-info h5{
 color: grey;
 font-weight: lighter;
+min-height: 18px;
+margin: 8px 0 0;
 }
 
 .div-img-info h2{
     font-weight: normal;
     font-size: 14px;
+    line-height: 1.25;
+    min-height: 36px;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 
 }
 
 .div-img-info p{
     font-size: 12px;
     font-weight: bolder;
+    margin: 0;
 }
 
 .div-dots{
@@ -738,6 +767,10 @@ font-weight: lighter;
     border-radius: 14px;
     padding: 14px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    min-height: 420px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
 .featured-deal-card img{
@@ -785,7 +818,7 @@ font-weight: lighter;
     font-size: 12px;
     font-weight: 600;
     padding: 8px 10px;
-    margin-top: 8px;
+    margin-top: auto;
     cursor: pointer;
 }
 
