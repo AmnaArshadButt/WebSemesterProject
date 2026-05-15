@@ -3,8 +3,8 @@
  * Run with: `node seeder/seed.js` (or `npm run seed`)
  * Expects MONGODB_URI in environment or falls back to the default in config/db.js
  */
-const connectDB = require('../config/db');
-const Product = require('../models/Product');
+const connectDB = require('./config/db');
+const Product = require('./models/Product');
 
 async function createSampleProducts() {
   // 30 sample products across categories for pagination/filter testing
