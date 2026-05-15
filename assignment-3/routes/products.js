@@ -5,6 +5,7 @@
  */
 const express = require('express');
 const Product = require('../models/Product');
+const { buildProductQuery } = require('../utils/queryBuilder');
 
 const router = express.Router();
 
@@ -15,19 +16,28 @@ const router = express.Router();
  */
 router.get('/', async (req, res, next) => {
   try {
+    // Pagination
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const limit = 8; // assignment requirement
     const skip = (page - 1) * limit;
 
-    const total = await Product.countDocuments({});
-    const products = await Product.find({}).skip(skip).limit(limit).lean();
-    const totalPages = Math.ceil(total / limit);
+    // Build filter & sort from query params
+    const { filter, sort } = buildProductQuery(req.query);
+
+    // Total matching documents for pagination metadata
+    const total = await Product.countDocuments(filter);
+
+    // Fetch page of results with applied filters and sort
+    const products = await Product.find(filter).sort(sort).skip(skip).limit(limit).lean();
+    const totalPages = Math.ceil(total / limit) || 1;
 
     res.json({
       page,
       totalPages,
       total,
       count: products.length,
+      filters: req.query,
+      sort,
       products
     });
   } catch (err) {
