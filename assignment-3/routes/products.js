@@ -26,11 +26,28 @@ router.get('/', async (req, res, next) => {
 
     // Total matching documents for pagination metadata
     const total = await Product.countDocuments(filter);
-
     // Fetch page of results with applied filters and sort
     const products = await Product.find(filter).sort(sort).skip(skip).limit(limit).lean();
     const totalPages = Math.ceil(total / limit) || 1;
 
+    // If client accepts HTML, render the EJS view; otherwise return JSON
+    if (req.accepts && req.accepts('html')) {
+      // Provide category list for filter dropdown
+      const categories = await Product.distinct('category');
+
+      return res.render('products', {
+        products,
+        page,
+        totalPages,
+        total,
+        count: products.length,
+        filters: req.query,
+        categories,
+        sort
+      });
+    }
+
+    // Default: JSON response for API consumers
     res.json({
       page,
       totalPages,

@@ -10,6 +10,10 @@ npm install
 
 2. Copy `.env.sample` to `.env` and edit `MONGODB_URI` if needed
 
+```powershell
+Copy-Item .env.sample .env
+```
+
 3. Seed the database with sample products
 
 ```bash
