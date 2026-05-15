@@ -5,21 +5,65 @@ const navLinks = document.querySelectorAll(".nav-menu a");
 const MOBILE_NAV_BREAKPOINT = 1300;
 
 if (menuToggle && navMenu) {
+    const topLevelItems = navMenu.querySelectorAll(".nav-list > li");
+
+    const getSubmenuElement = (item) =>
+        item.querySelector(':scope > div[class^="submenu-"]') ||
+        item.querySelector(':scope > div > [class^="submenu-"]');
+
+    const clearOpenSubmenus = () => {
+        topLevelItems.forEach((item) => item.classList.remove("is-submenu-open"));
+    };
+
     const closeMenu = () => {
         navMenu.classList.remove("active");
         menuToggle.classList.remove("is-open");
         menuToggle.setAttribute("aria-expanded", "false");
+        clearOpenSubmenus();
     };
 
     menuToggle.addEventListener("click", () => {
         const isOpen = navMenu.classList.toggle("active");
         menuToggle.classList.toggle("is-open", isOpen);
         menuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+
+        if (!isOpen) {
+            clearOpenSubmenus();
+        }
+    });
+
+    topLevelItems.forEach((item) => {
+        const topLevelLink = item.querySelector(":scope > a");
+        const submenu = getSubmenuElement(item);
+
+        if (!topLevelLink || !submenu) {
+            return;
+        }
+
+        topLevelLink.addEventListener("click", (event) => {
+            if (window.innerWidth > MOBILE_NAV_BREAKPOINT) {
+                return;
+            }
+
+            event.preventDefault();
+
+            const willOpen = !item.classList.contains("is-submenu-open");
+            clearOpenSubmenus();
+            item.classList.toggle("is-submenu-open", willOpen);
+        });
     });
 
     navLinks.forEach((link) => {
         link.addEventListener("click", () => {
             if (window.innerWidth <= MOBILE_NAV_BREAKPOINT) {
+                const parentItem = link.closest(".nav-list > li");
+                const isTopLevelLink = parentItem && parentItem.querySelector(":scope > a") === link;
+                const hasSubmenu = parentItem && getSubmenuElement(parentItem);
+
+                if (isTopLevelLink && hasSubmenu) {
+                    return;
+                }
+
                 closeMenu();
             }
         });
@@ -133,8 +177,8 @@ if (window.jQuery) {
                             return `
                                 <div class="div-img-info">
                                     <div class="heart-icon-div">
-                                        <img class="heart-icon" src="icons/heart-svgrepo-com.svg" alt="Heart Icon" />
-                                        <img class="heart-icon-filled" src="icons/filledheart.svg" alt="Heart Filled" />
+                                        <img class="heart-icon" src="images/icons/heart-svgrepo-com.svg" alt="Heart Icon" />
+                                        <img class="heart-icon-filled" src="images/icons/filledheart.svg" alt="Heart Filled" />
                                     </div>
                                     <img src="${product.image}" alt="${product.title}">
                                     <span>
