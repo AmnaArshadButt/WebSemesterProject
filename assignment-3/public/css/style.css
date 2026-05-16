@@ -107,6 +107,14 @@ html , body{
     font-size: 12px;
 }
 
+.shop-item{ position: relative; }
+.shop-item > a{ color:#5e0d0d; }
+.shop-dropdown{ position:absolute; top:38px; left:0; background:#fff; border:1px solid #e6e6e6; box-shadow:0 6px 18px rgba(0,0,0,0.08); display:none; min-width:160px; z-index:20 }
+.shop-dropdown ul{ padding:8px 0; margin:0 }
+.shop-dropdown li{ list-style:none }
+.shop-dropdown a{ display:block; padding:8px 12px; color:#333; text-decoration:none }
+.shop-item:hover .shop-dropdown{ display:block }
+
 .nav-list-item, .nav-list-item2, .nav-list-item6{
     text-align: center;
     justify-content: center;
@@ -1193,7 +1201,7 @@ body.quick-view-open{
 
     .div-img-info{
         width: calc(50vw - 16px);
-        min-width: 130px;
+    
     }
 
     .mobile-footer-item{

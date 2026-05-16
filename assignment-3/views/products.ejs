@@ -27,7 +27,9 @@
       </button>
 
       <div class="divlogo">
-        <img class="logo-img" src="/images/icons/logo.svg" alt="Khaddi Replica Logo" />
+        <a href="/">
+          <img class="logo-img" src="/images/icons/logo.svg" alt="Khaddi Replica Logo" />
+        </a>
       </div>
 
       <div class="nav-menu">
@@ -97,9 +99,17 @@
         <% } %>
 
         <% products.forEach(function(p) { %>
-          <article class="product-card">
+          <article class="product-card" data-id="<%= p._id %>" data-name="<%= p.name %>" data-price="<%= p.price %>" data-description="<%= (p.description || '').replace(/"/g, '&quot;') %>" data-colors="<%= (p.colors || []).join(',') %>" data-image="<%= p.image %>">
             <div class="product-image-wrap">
               <img src="<%= p.image || '/uploads/images/img1.png' %>" alt="<%= p.name %>" class="product-image" />
+              <div class="card-actions">
+                <button class="icon-btn view-btn" type="button" title="View">
+                  <span class="material-icons">visibility</span>
+                </button>
+                <button class="icon-btn cart-btn" type="button" title="Add to cart">
+                  <span class="material-icons">add_shopping_cart</span>
+                </button>
+              </div>
             </div>
             <div class="product-info">
               <h3 class="product-title"><%= p.name %></h3>
@@ -128,5 +138,23 @@
         <% } %>
       </nav>
     </main>
+    <!-- Product quick-view modal -->
+    <div id="product-modal" class="product-modal" aria-hidden="true">
+      <div class="product-modal-dialog">
+        <button id="modal-close" class="modal-close" aria-label="Close">&times;</button>
+        <div class="modal-body">
+          <div class="modal-image"><img src="" alt="" id="modal-image"></div>
+          <div class="modal-info">
+            <h2 id="modal-title"></h2>
+            <p id="modal-price"></p>
+            <p id="modal-desc"></p>
+            <div id="modal-colors" class="modal-colors"></div>
+            <button id="modal-add-cart" class="btn-primary">Add to cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/products.js" defer></script>
   </body>
 </html>

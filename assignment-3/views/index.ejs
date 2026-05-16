@@ -27,7 +27,9 @@
       </button>
 
       <div class="divlogo">
-        <img class="logo-img" src="/images/icons/logo.svg" alt="Khaddi Replica Logo" />
+        <a href="/">
+          <img class="logo-img" src="/images/icons/logo.svg" alt="Khaddi Replica Logo" />
+        </a>
       </div>
 
       <div class="nav-menu">
@@ -181,7 +183,16 @@
           </div>
           
           </li>
-          <li class="nav-list-item"><a href="/products"><strong>SHOP</strong></a></li>
+          <li class="nav-list-item shop-item">
+            <a href="/products"><strong>SHOP</strong></a>
+            <div class="shop-dropdown">
+              <ul>
+                <% (categories || []).forEach(function(cat) { %>
+                  <li><a href="/products?category=<%= encodeURIComponent(cat) %>"><%= cat %></a></li>
+                <% }) %>
+              </ul>
+            </div>
+          </li>
           <li class="nav-list-item6"><a href="#">SALES</a>
             <div class="submenu-sales">
             

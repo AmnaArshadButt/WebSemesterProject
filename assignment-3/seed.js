@@ -42,21 +42,16 @@ async function createSampleProducts() {
   ];
 
   // Add small variations to ensure uniqueness
-  const images = [
-    '/uploads/images/img1.png',
-    '/uploads/images/img2.png',
-    '/uploads/images/img3.png',
-    '/uploads/images/newin-img.png',
-    '/uploads/images/newin2.png',
-    '/uploads/images/newin3.png'
-  ];
+ 
 
   return sample.map((p, i) => {
     const name = `${p.name} ${i + 1}`;
+    const categoryKeyword = p.category.split(' ')[0] || p.category;
+    const image = `https://source.unsplash.com/800x600/?${encodeURIComponent(categoryKeyword)}`;
     return {
       ...p,
       name,
-      image: images[i % images.length],
+      image: image,
       slug: slugify(`${name}-${i + 1}`, { lower: true, strict: true })
     };
   });

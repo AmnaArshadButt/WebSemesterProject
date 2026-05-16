@@ -29,8 +29,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Basic landing page (existing)
-app.get('/', (req, res) => {
-    res.render('index');
+const Product = require('./models/Product');
+app.get('/', async (req, res) => {
+    try {
+        // Fetch distinct categories for navbar dropdown
+        const categories = await Product.distinct('category');
+        res.render('index', { categories });
+    } catch (err) {
+        console.error('Error fetching categories for index:', err);
+        res.render('index', { categories: [] });
+    }
 });
 
 // Mount products API / catalog router (phase 1: JSON + pagination skeleton)
