@@ -4,35 +4,92 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Products</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <link rel="stylesheet" href="/css/style.css" />
+    <script src="/js/menu.js" defer></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
   </head>
   <body>
-    <main class="products-page">
-      <h1>Products</h1>
+    <div class="divbar">
+      <p class="bar-line">
+        Explore new styles designed for brighter days<span
+          ><strong><pre> <u> right here.</u></pre></strong></span
+        >
+      </p>
+    </div>
 
-      <form id="filters-form" method="get" action="/products">
-        <input type="text" name="q" placeholder="Search by name" value="<%= filters.q || '' %>" />
+    <nav class="nav-bar">
 
-        <select name="category">
-          <option value="">All Categories</option>
-          <% categories.forEach(function(cat) { %>
-            <option value="<%= cat %>" <%= filters.category === cat ? 'selected' : '' %>><%= cat %></option>
-          <% }) %>
-        </select>
+      <button class="menu-toggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
 
-        <input type="number" name="minPrice" step="0.01" placeholder="Min price" value="<%= filters.minPrice || '' %>" />
-        <input type="number" name="maxPrice" step="0.01" placeholder="Max price" value="<%= filters.maxPrice || '' %>" />
+      <div class="divlogo">
+        <img class="logo-img" src="/images/icons/logo.svg" alt="Khaddi Replica Logo" />
+      </div>
 
-        <select name="sort">
-          <option value="">Sort</option>
-          <option value="price_asc" <%= filters.sort === 'price_asc' ? 'selected' : '' %>>Price: Low → High</option>
-          <option value="price_desc" <%= filters.sort === 'price_desc' ? 'selected' : '' %>>Price: High → Low</option>
-          <option value="rating_desc" <%= filters.sort === 'rating_desc' ? 'selected' : '' %>>Rating</option>
-          <option value="name_asc" <%= filters.sort === 'name_asc' ? 'selected' : '' %>>Name A → Z</option>
-        </select>
+      <div class="nav-menu">
 
-        <button type="submit">Apply</button>
-      </form>
+        <ul class="nav-list">
+
+          <li class="nav-list-item"><a href="#">NEW IN</a></li>
+          <li class="nav-list-item2"><a href="#"><strong>FROM RAMADAN TO EID</strong></a></li>
+          <li class="nav-list-item"><a href="#">READY TO WEAR</a></li>
+          <li class="nav-list-item"><a href="#">FABRICS</a></li>
+          <li class="nav-list-item"><a href="#">FRAGNANCES</a></li>
+          <li class="nav-list-item"><a href="/products"><strong>SHOP</strong></a></li>
+          <li class="nav-list-item6"><a href="#">SALES</a></li>
+          <li class="nav-list-item"> <a href="#"><strong>NOW HAPPENING</strong></a></li>
+
+        </ul>
+
+      </div>
+
+      <div class="navdiv-icons">
+        <img class="nav-icons" src="/images/icons/search-svgrepo-com.svg" alt="Search Icon" />
+        <img class="nav-icons" src="/images/icons/heart-svgrepo-com.svg" alt="Heart Icon" />
+        <img class="nav-icons" src="/images/icons/user-svgrepo-com.svg" alt="User Icon" />
+        <img
+          class="nav-icons"
+          src="/images/icons/shopping-bag-svgrepo-com.svg"
+          alt="Shopping Bag Icon"
+        />
+      </div>
+    </nav>
+
+    <main class="products-page site-content">
+      <div class="products-hero">
+        <h1>Products</h1>
+        <p class="products-sub">Browse our catalog — use the filters to refine results.</p>
+      </div>
+
+      <div class="products-controls">
+        <form id="filters-form" method="get" action="/products">
+          <input type="text" name="q" placeholder="Search by name" value="<%= filters.q || '' %>" />
+
+          <select name="category">
+            <option value="">All Categories</option>
+            <% categories.forEach(function(cat) { %>
+              <option value="<%= cat %>" <%= filters.category === cat ? 'selected' : '' %>><%= cat %></option>
+            <% }) %>
+          </select>
+
+          <input type="number" name="minPrice" step="0.01" placeholder="Min price" value="<%= filters.minPrice || '' %>" />
+          <input type="number" name="maxPrice" step="0.01" placeholder="Max price" value="<%= filters.maxPrice || '' %>" />
+
+          <select name="sort">
+            <option value="">Sort</option>
+            <option value="price_asc" <%= filters.sort === 'price_asc' ? 'selected' : '' %>>Price: Low → High</option>
+            <option value="price_desc" <%= filters.sort === 'price_desc' ? 'selected' : '' %>>Price: High → Low</option>
+            <option value="rating_desc" <%= filters.sort === 'rating_desc' ? 'selected' : '' %>>Rating</option>
+            <option value="name_asc" <%= filters.sort === 'name_asc' ? 'selected' : '' %>>Name A → Z</option>
+          </select>
+
+          <button type="submit">Apply</button>
+        </form>
+      </div>
 
       <section class="products-grid">
         <% if (!products.length) { %>
@@ -41,11 +98,14 @@
 
         <% products.forEach(function(p) { %>
           <article class="product-card">
-            <h3><%= p.name %></h3>
-            <p><strong>$<%= p.price.toFixed(2) %></strong></p>
-            <p>Category: <%= p.category %></p>
-            <p>Rating: <%= p.rating %></p>
-            <p>Stock: <%= p.stock %></p>
+            <div class="product-image-wrap">
+              <img src="<%= p.image || '/uploads/images/img1.png' %>" alt="<%= p.name %>" class="product-image" />
+            </div>
+            <div class="product-info">
+              <h3 class="product-title"><%= p.name %></h3>
+              <p class="product-price"><strong>$<%= p.price.toFixed(2) %></strong></p>
+              <p class="product-meta">Category: <%= p.category %> · Rating: <%= p.rating %> · Stock: <%= p.stock %></p>
+            </div>
           </article>
         <% }) %>
       </section>

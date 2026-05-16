@@ -5,6 +5,7 @@
  */
 const connectDB = require('./config/db');
 const Product = require('./models/Product');
+const slugify = require('slugify');
 
 async function createSampleProducts() {
   // 30 sample products across categories for pagination/filter testing
@@ -41,7 +42,24 @@ async function createSampleProducts() {
   ];
 
   // Add small variations to ensure uniqueness
-  return sample.map((p, i) => ({ ...p, name: `${p.name} ${i + 1}` }));
+  const images = [
+    '/uploads/images/img1.png',
+    '/uploads/images/img2.png',
+    '/uploads/images/img3.png',
+    '/uploads/images/newin-img.png',
+    '/uploads/images/newin2.png',
+    '/uploads/images/newin3.png'
+  ];
+
+  return sample.map((p, i) => {
+    const name = `${p.name} ${i + 1}`;
+    return {
+      ...p,
+      name,
+      image: images[i % images.length],
+      slug: slugify(`${name}-${i + 1}`, { lower: true, strict: true })
+    };
+  });
 }
 
 async function run() {
