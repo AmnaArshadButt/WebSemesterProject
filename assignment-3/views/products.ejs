@@ -88,8 +88,7 @@
             <option value="rating_desc" <%= filters.sort === 'rating_desc' ? 'selected' : '' %>>Rating</option>
             <option value="name_asc" <%= filters.sort === 'name_asc' ? 'selected' : '' %>>Name A → Z</option>
           </select>
-
-          <button type="submit">Apply</button>
+          <!-- Apply button removed: filters auto-submit on change -->
         </form>
       </div>
 
@@ -148,9 +147,6 @@
             <h2 id="modal-title"></h2>
             <p id="modal-price"></p>
             <p id="modal-desc"></p>
-            <div id="modal-colors" class="modal-colors"></div>
-            <button id="modal-add-cart" class="btn-primary">Add to cart</button>
-          </div>
         </div>
       </div>
     </div>

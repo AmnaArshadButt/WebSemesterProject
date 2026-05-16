@@ -41,13 +41,21 @@ async function createSampleProducts() {
     { name: 'Portable Projector', price: 199.99, category: 'Electronics', rating: 4.3, stock: 8, image: '', description: 'Mini portable projector' }
   ];
 
-  // Add small variations to ensure uniqueness
- 
+  // Map category to a stable Unsplash image; fallback to dynamic search
+  const categoryImages = {
+    Electronics: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9',
+    Fashion: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8',
+    Home: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85',
+    Sports: 'https://images.unsplash.com/photo-1517649763962-0c623066013b',
+    Beauty: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9'
+  };
 
   return sample.map((p, i) => {
     const name = `${p.name} ${i + 1}`;
     const categoryKeyword = p.category.split(' ')[0] || p.category;
-    const image = `https://source.unsplash.com/800x600/?${encodeURIComponent(categoryKeyword)}`;
+    const image = (categoryImages[p.category]
+      ? `${categoryImages[p.category]}?auto=format&fit=crop&w=800&q=60`
+      : `https://source.unsplash.com/800x600/?${encodeURIComponent(categoryKeyword)}`);
     return {
       ...p,
       name,

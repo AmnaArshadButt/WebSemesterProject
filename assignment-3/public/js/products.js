@@ -71,7 +71,11 @@ document.addEventListener('DOMContentLoaded', function () {
       image: card.dataset.image
     };
 
-    if (viewBtn) viewBtn.addEventListener('click', () => openModal(data));
+    // View button: open small quick-card popup near the product card
+    if (viewBtn) viewBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openQuickCard(card, data);
+    });
 
     if (cartBtn) cartBtn.addEventListener('click', () => {
       // simple visual confirmation
@@ -80,12 +84,66 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // modal add to cart
-  const modalAdd = document.getElementById('modal-add-cart');
-  if (modalAdd) modalAdd.addEventListener('click', () => {
-    // visual feedback
-    modalAdd.textContent = 'Added';
-    setTimeout(() => modalAdd.textContent = 'Add to cart', 900);
-    closeModal();
-  });
+  // Quick-card popup (small inline product card)
+  let quickCardEl = null;
+  function createQuickCard() {
+    quickCardEl = document.createElement('div');
+    quickCardEl.className = 'quick-card';
+    quickCardEl.innerHTML = `
+      <div class="quick-card-inner">
+        <img class="qc-image" src="" alt="">
+        <div class="qc-body">
+          <h4 class="qc-title"></h4>
+          <p class="qc-price"></p>
+          <div class="qc-colors"></div>
+          <div class="qc-actions">
+            <button class="qc-add btn-small">Add</button>
+            <button class="qc-more btn-small">View</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(quickCardEl);
+
+    // close when clicking outside
+    document.addEventListener('click', (ev) => {
+      if (!quickCardEl) return;
+      if (!quickCardEl.contains(ev.target)) hideQuickCard();
+    });
+  }
+
+  function openQuickCard(cardEl, data) {
+    if (!quickCardEl) createQuickCard();
+    const img = quickCardEl.querySelector('.qc-image');
+    const title = quickCardEl.querySelector('.qc-title');
+    const price = quickCardEl.querySelector('.qc-price');
+    const colors = quickCardEl.querySelector('.qc-colors');
+    const addBtn = quickCardEl.querySelector('.qc-add');
+    const moreBtn = quickCardEl.querySelector('.qc-more');
+
+    img.src = data.image || '';
+    img.alt = data.name || '';
+    title.textContent = data.name || '';
+    price.textContent = `$${Number(data.price).toFixed(2)}`;
+    colors.innerHTML = '';
+    if (data.colors) data.colors.split(',').forEach(c => {
+      const s = document.createElement('span'); s.className = 'color-swatch'; s.textContent = c.trim(); colors.appendChild(s);
+    });
+
+    addBtn.onclick = (ev) => { ev.stopPropagation(); addBtn.textContent = 'Added'; setTimeout(() => addBtn.textContent = 'Add', 900); hideQuickCard(); };
+    moreBtn.onclick = (ev) => { ev.stopPropagation(); openModal(data); hideQuickCard(); };
+
+    // position near card
+    const rect = cardEl.getBoundingClientRect();
+    quickCardEl.style.top = `${window.scrollY + rect.top + 10}px`;
+    quickCardEl.style.left = `${rect.right + 12}px`;
+    quickCardEl.classList.add('is-open');
+  }
+
+  function hideQuickCard() {
+    if (!quickCardEl) return;
+    quickCardEl.classList.remove('is-open');
+  }
+
+ 
 });
