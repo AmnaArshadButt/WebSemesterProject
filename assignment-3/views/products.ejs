@@ -42,7 +42,15 @@
           <li class="nav-list-item"><a href="#">READY TO WEAR</a></li>
           <li class="nav-list-item"><a href="#">FABRICS</a></li>
           <li class="nav-list-item"><a href="#">FRAGNANCES</a></li>
-          <li class="nav-list-item"><a href="/products"><strong>SHOP</strong></a></li>
+          <li class="nav-list-item shop-item"><a href="/products"><strong>SHOP</strong></a>
+            <div class="shop-dropdown">
+              <ul>
+                <% (categories || []).forEach(function(cat) { %>
+                  <li><a href="/products?category=<%= encodeURIComponent(cat) %>"><%= cat %></a></li>
+                <% }) %>
+              </ul>
+            </div>
+          </li>
           <li class="nav-list-item6"><a href="#">SALES</a></li>
           <li class="nav-list-item"> <a href="#"><strong>NOW HAPPENING</strong></a></li>
 
@@ -133,7 +141,7 @@
             <div class="product-info">
               <h3 class="product-title"><%= p.name %></h3>
               <p class="product-price"><strong>$<%= p.price.toFixed(2) %></strong></p>
-              <p class="product-meta">Category: <%= p.category %> · Rating: <%= p.rating %> · Stock: <%= p.stock %></p>
+              <p class="product-meta">Category: <%= p.category %> · Rating: <%= p.rating %> </p>
             </div>
           </article>
         <% }) %>

@@ -20,13 +20,18 @@
     align-items: center;
 }
 
-.reset-btn{
+.btn-reset{
     padding: 8px 12px;
     border-radius: 6px;
     border: 1px solid #ddd;
     background: #fff;
     cursor: pointer;
     font-size: 13px;
+   
+}
+
+.btn-reset:hover{
+    background: #d14949;
 }
 
 .products-controls input[type="text"],
@@ -133,11 +138,13 @@
     background: rgba(255, 255, 255, 0.92);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     cursor: pointer;
+    z-index: 10;
 }
 
 .icon-btn .material-icons{
     font-size: 18px;
     color: #333;
+    z-index: 10;
 }
 
 .icon-btn.added{
@@ -174,6 +181,7 @@
     background: #fff;
     cursor: pointer;
     font-size: 13px;
+    z-index: 10;
 }
 
 .quick-card{
