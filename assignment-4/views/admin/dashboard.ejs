@@ -11,6 +11,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/admin.css" />
+    <script src="/js/admin.js" defer></script>
   </head>
   <body>
     <div class="admin-shell">
@@ -25,6 +26,7 @@
               Monitor inventory and prepare product management workflows from one place.
             </p>
           </div>
+          <a class="admin-primary-link" href="/admin/products/new">Add product</a>
         </header>
 
         <section class="admin-stats" aria-label="Dashboard summary">
@@ -58,12 +60,13 @@
                   <th>Price</th>
                   <th>Stock</th>
                   <th>Category</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <% if (!products.length) { %>
                   <tr>
-                    <td colspan="4" class="empty-state">No products available yet.</td>
+                    <td colspan="5" class="empty-state">No products available yet.</td>
                   </tr>
                 <% } %>
 
@@ -87,6 +90,14 @@
                     <td>$<%= Number(product.price || 0).toFixed(2) %></td>
                     <td><%= product.stock ?? 0 %></td>
                     <td><%= product.category %></td>
+                    <td>
+                      <div class="action-group">
+                        <a class="admin-action-link" href="/admin/products/<%= product._id %>/edit">Edit</a>
+                        <form class="delete-form" action="/admin/products/<%= product._id %>/delete" method="post">
+                          <button class="admin-danger-button" type="submit">Delete</button>
+                        </form>
+                      </div>
+                    </td>
                   </tr>
                 <% }) %>
               </tbody>
