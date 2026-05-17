@@ -1,9 +1,43 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs/promises');
 
 const Product = require('../models/Product');
 const Category = require('../models/category');
 
 const router = express.Router();
+
+const uploadDirectory = path.join(__dirname, '..', 'public', 'uploads', 'products');
+
+const imageUpload = multer({
+  storage: multer.diskStorage({
+    destination: uploadDirectory,
+    filename: (req, file, callback) => {
+      const extension = path.extname(file.originalname).toLowerCase();
+      const baseName = path
+        .basename(file.originalname, extension)
+        .replace(/[^a-z0-9]+/gi, '-')
+        .replace(/^-+|-+$/g, '')
+        .toLowerCase();
+
+      callback(null, `${Date.now()}-${baseName || 'product'}${extension}`);
+    }
+  }),
+  fileFilter: (req, file, callback) => {
+    const allowedTypes = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+    const extension = path.extname(file.originalname).toLowerCase();
+
+    if (!allowedTypes.includes(extension)) {
+      return callback(new Error('Only image files are allowed.'));
+    }
+
+    callback(null, true);
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024
+  }
+});
 
 async function loadAdminViewData() {
   let categories = await Category.find({}, { name: 1, _id: 0 }).sort({ name: 1 }).lean();
@@ -25,6 +59,28 @@ function buildProductFormData(body = {}, existingProduct = null) {
     image: String(body.image ?? existingProduct?.image ?? '').trim(),
     description: String(body.description ?? existingProduct?.description ?? '').trim()
   };
+}
+
+function resolveProductImage(req, fallbackImage = '') {
+  if (req.file) {
+    return `/uploads/products/${req.file.filename}`;
+  }
+
+  return String(req.body.currentImage ?? fallbackImage ?? '').trim();
+}
+
+async function removeUploadedFile(file) {
+  if (!file || !file.path) {
+    return;
+  }
+
+  try {
+    await fs.unlink(file.path);
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      throw err;
+    }
+  }
 }
 
 function validateProductForm(data) {
@@ -72,26 +128,31 @@ router.get('/products/new', async (req, res, next) => {
       formAction: '/admin/products',
       formData: buildProductFormData(),
       categories,
-      errors: []
+      errors: [],
+      product: null
     });
   } catch (err) {
     next(err);
   }
 });
 
-router.post('/products', async (req, res, next) => {
+router.post('/products', imageUpload.single('imageFile'), async (req, res, next) => {
   try {
     const { categories } = await loadAdminViewData();
     const formData = buildProductFormData(req.body);
     const errors = validateProductForm(formData);
+    const image = resolveProductImage(req);
 
     if (errors.length) {
+      await removeUploadedFile(req.file);
+
       return res.status(400).render('admin/product-form', {
         mode: 'create',
         formAction: '/admin/products',
         formData,
         categories,
-        errors
+        errors,
+        product: null
       });
     }
 
@@ -100,7 +161,7 @@ router.post('/products', async (req, res, next) => {
       price: Number(formData.price),
       stock: Number(formData.stock),
       category: formData.category,
-      image: formData.image || '',
+      image,
       description: formData.description || ''
     });
 
@@ -133,7 +194,7 @@ router.get('/products/:id/edit', async (req, res, next) => {
   }
 });
 
-router.post('/products/:id', async (req, res, next) => {
+router.post('/products/:id', imageUpload.single('imageFile'), async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
 
@@ -144,8 +205,11 @@ router.post('/products/:id', async (req, res, next) => {
     const { categories } = await loadAdminViewData();
     const formData = buildProductFormData(req.body, product);
     const errors = validateProductForm(formData);
+    const image = resolveProductImage(req, product.image);
 
     if (errors.length) {
+      await removeUploadedFile(req.file);
+
       return res.status(400).render('admin/product-form', {
         mode: 'edit',
         formAction: `/admin/products/${product._id}`,
@@ -160,7 +224,7 @@ router.post('/products/:id', async (req, res, next) => {
     product.price = Number(formData.price);
     product.stock = Number(formData.stock);
     product.category = formData.category;
-    product.image = formData.image || '';
+    product.image = image;
     product.description = formData.description || '';
 
     await product.save();
@@ -178,6 +242,24 @@ router.post('/products/:id/delete', async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+router.use(async (err, req, res, next) => {
+  if (err && err.message === 'Only image files are allowed.') {
+    const { categories } = await loadAdminViewData();
+    const isEditRoute = /^\/admin\/products\/[^/]+$/.test(req.originalUrl);
+
+    return res.status(400).render('admin/product-form', {
+      mode: isEditRoute ? 'edit' : 'create',
+      formAction: isEditRoute ? req.originalUrl : '/admin/products',
+      formData: buildProductFormData(req.body),
+      categories,
+      errors: [err.message],
+      product: null
+    });
+  }
+
+  return next(err);
 });
 
 module.exports = router;

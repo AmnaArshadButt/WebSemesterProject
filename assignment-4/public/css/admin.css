@@ -251,9 +251,35 @@ a {
   color: var(--admin-text);
 }
 
+.form-grid input[type='file'] {
+  padding: 12px 0;
+  border: 0;
+  background: transparent;
+}
+
 .form-grid textarea {
   resize: vertical;
   min-height: 140px;
+}
+
+.field-hint {
+  display: block;
+  color: var(--admin-muted);
+  font-size: 0.86rem;
+}
+
+.image-preview {
+  width: min(320px, 100%);
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--admin-border);
+  background: rgba(18, 33, 47, 0.04);
+}
+
+.image-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .form-span-2 {

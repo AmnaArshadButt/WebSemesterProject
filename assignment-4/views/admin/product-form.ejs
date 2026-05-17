@@ -40,7 +40,7 @@
         <% } %>
 
         <section class="admin-panel">
-          <form class="admin-form" action="<%= formAction %>" method="post">
+          <form class="admin-form" action="<%= formAction %>" method="post" enctype="multipart/form-data">
             <div class="form-grid">
               <label>
                 <span>Product name *</span>
@@ -68,9 +68,22 @@
               </label>
 
               <label class="form-span-2">
-                <span>Image path</span>
-                <input type="text" name="image" value="<%= formData.image %>" placeholder="/uploads/images/example.png" />
+                <span>Upload image</span>
+                <input type="file" name="imageFile" accept="image/*" />
+                <input type="hidden" name="currentImage" value="<%= formData.image %>" />
+                <small class="field-hint">
+                  <%= mode === 'edit' ? 'Choose a new file to replace the existing image.' : 'Upload a local image file for the product.' %>
+                </small>
               </label>
+
+              <% if (typeof product !== 'undefined' && product && product.image) { %>
+                <label class="form-span-2">
+                  <span>Current image</span>
+                  <div class="image-preview">
+                    <img src="<%= product.image %>" alt="Current product image" />
+                  </div>
+                </label>
+              <% } %>
 
               <label class="form-span-2">
                 <span>Description</span>
