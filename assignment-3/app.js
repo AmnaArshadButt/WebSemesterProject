@@ -12,6 +12,7 @@ require('dotenv').config();
 
 const connectDB = require('./config/db');
 const productsRouter = require('./routes/products');
+const categoryRouter = require('./routes/category');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -30,10 +31,14 @@ app.use(express.urlencoded({ extended: true }));
 
 // Basic landing page (existing)
 const Product = require('./models/Product');
+const Category = require('./models/category');
 app.get('/', async (req, res) => {
     try {
         // Fetch distinct categories for navbar dropdown
-        const categories = await Product.distinct('category');
+        let categories = (await Category.find({}, { name: 1, _id: 0 }).sort({ name: 1 }).lean()).map((cat) => cat.name);
+        if (!categories.length) {
+            categories = await Product.distinct('category');
+        }
         res.render('index', { categories });
     } catch (err) {
         console.error('Error fetching categories for index:', err);
@@ -43,6 +48,7 @@ app.get('/', async (req, res) => {
 
 // Mount products API / catalog router (phase 1: JSON + pagination skeleton)
 app.use('/products', productsRouter);
+app.use('/categories', categoryRouter);
 
 // Simple error handler
 app.use((err, req, res, next) => {

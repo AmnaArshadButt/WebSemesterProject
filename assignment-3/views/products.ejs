@@ -6,6 +6,7 @@
     <title>Products</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/product.css" />
     <script src="/js/menu.js" defer></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
   </head>
@@ -69,17 +70,36 @@
 
       <div class="products-controls">
         <form id="filters-form" method="get" action="/products">
-          <input type="text" name="q" placeholder="Search by name" value="<%= filters.q || '' %>" />
+          <input
+            type="text"
+            name="q"
+            placeholder="Search by name"
+            value="<%= filters.q || '' %>"
+          />
 
+          <% const selectedCategory = Array.isArray(filters.category) ? filters.category[0] : (filters.category || ''); %>
           <select name="category">
             <option value="">All Categories</option>
             <% categories.forEach(function(cat) { %>
-              <option value="<%= cat %>" <%= filters.category === cat ? 'selected' : '' %>><%= cat %></option>
+              <option value="<%= cat %>" <%= selectedCategory === cat ? 'selected' : '' %>><%= cat %></option>
             <% }) %>
           </select>
 
-          <input type="number" name="minPrice" step="0.01" placeholder="Min price" value="<%= filters.minPrice || '' %>" />
-          <input type="number" name="maxPrice" step="0.01" placeholder="Max price" value="<%= filters.maxPrice || '' %>" />
+          <input
+            type="number"
+            name="minPrice"
+            step="0.01"
+            placeholder="Min price"
+            min="0"
+            value="<%= (filters.minPrice !== undefined && filters.minPrice !== '') ? filters.minPrice : '0' %>"
+          />
+          <input
+            type="number"
+            name="maxPrice"
+            step="0.01"
+            placeholder="Max price"
+            value="<%= filters.maxPrice || '' %>"
+          />
 
           <select name="sort">
             <option value="">Sort</option>
@@ -88,7 +108,7 @@
             <option value="rating_desc" <%= filters.sort === 'rating_desc' ? 'selected' : '' %>>Rating</option>
             <option value="name_asc" <%= filters.sort === 'name_asc' ? 'selected' : '' %>>Name A → Z</option>
           </select>
-          <!-- Apply button removed: filters auto-submit on change -->
+          <button type="button" id="reset-filters" class="btn-reset">Reset Filters</button>
         </form>
       </div>
 

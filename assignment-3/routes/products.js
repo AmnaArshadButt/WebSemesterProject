@@ -5,6 +5,7 @@
  */
 const express = require('express');
 const Product = require('../models/Product');
+const Category = require('../models/category');
 const { buildProductQuery } = require('../utils/queryBuilder');
 
 const router = express.Router();
@@ -33,7 +34,19 @@ router.get('/', async (req, res, next) => {
     // If client accepts HTML, render the EJS view; otherwise return JSON
     if (req.accepts && req.accepts('html')) {
       // Provide category list for filter dropdown
-      const categories = await Product.distinct('category');
+      let categories = (await Category.find({}, { name: 1, _id: 0 }).sort({ name: 1 }).lean()).map((cat) => cat.name);
+      if (!categories.length) {
+        categories = await Product.distinct('category');
+      }
+
+      const filters = {
+        q: '',
+        category: '',
+        minPrice: '0',
+        maxPrice: '',
+        sort: '',
+        ...req.query
+      };
 
       return res.render('products', {
         products,
@@ -41,7 +54,7 @@ router.get('/', async (req, res, next) => {
         totalPages,
         total,
         count: products.length,
-        filters: req.query,
+        filters,
         categories,
         sort
       });

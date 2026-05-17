@@ -9,15 +9,54 @@ document.addEventListener('DOMContentLoaded', function () {
     return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
   };
 
-  const submitForm = () => { form.submit(); };
+  const qInput = form.querySelector('input[name="q"]');
+  const categoryInput = form.querySelector('select[name="category"]');
+  const minPriceInput = form.querySelector('input[name="minPrice"]');
+  const maxPriceInput = form.querySelector('input[name="maxPrice"]');
+  const sortInput = form.querySelector('select[name="sort"]');
 
-  form.querySelectorAll('select, input[type="number"]').forEach(el => {
-    el.addEventListener('change', submitForm);
+  const resetFilterInputs = () => {
+    if (categoryInput) categoryInput.value = '';
+    if (minPriceInput) minPriceInput.value = '0';
+    if (maxPriceInput) maxPriceInput.value = '';
+  };
+
+  const resetSearchInput = () => {
+    if (qInput) qInput.value = '';
+  };
+
+  if (qInput) {
+    qInput.addEventListener('input', debounce(() => {
+      resetFilterInputs();
+      form.submit();
+    }, 600));
+  }
+
+  [categoryInput, minPriceInput, maxPriceInput].forEach((el) => {
+    if (!el) return;
+    el.addEventListener('change', () => {
+      resetSearchInput();
+      form.submit();
+    });
   });
 
-  const qInput = form.querySelector('input[name="q"]');
-  if (qInput) {
-    qInput.addEventListener('input', debounce(() => { form.submit(); }, 400));
+  if (sortInput) {
+    sortInput.addEventListener('change', () => {
+      form.submit();
+    });
+  }
+
+  // Reset filters button
+  const resetBtn = document.getElementById('reset-filters');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (qInput) qInput.value = '';
+      if (categoryInput) categoryInput.value = '';
+      if (minPriceInput) minPriceInput.value = '0';
+      if (maxPriceInput) maxPriceInput.value = '';
+      if (sortInput) sortInput.value = '';
+      form.submit();
+    });
   }
 
   // Quick-view modal
@@ -37,14 +76,16 @@ document.addEventListener('DOMContentLoaded', function () {
     modalTitle.textContent = data.name || '';
     modalPrice.textContent = `$${Number(data.price).toFixed(2)}`;
     modalDesc.textContent = data.description || '';
-    modalColors.innerHTML = '';
-    if (data.colors) {
-      data.colors.split(',').forEach(c => {
-        const span = document.createElement('span');
-        span.className = 'color-swatch';
-        span.textContent = c.trim();
-        modalColors.appendChild(span);
-      });
+    if (modalColors) {
+      modalColors.innerHTML = '';
+      if (data.colors) {
+        data.colors.split(',').forEach(c => {
+          const span = document.createElement('span');
+          span.className = 'color-swatch';
+          span.textContent = c.trim();
+          modalColors.appendChild(span);
+        });
+      }
     }
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');

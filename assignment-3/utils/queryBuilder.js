@@ -3,30 +3,55 @@
  * Keeps route logic minimal and easier to test.
  */
 function buildProductQuery(params) {
+  const toList = (value) => {
+    if (Array.isArray(value)) {
+      return value
+        .flatMap((item) => String(item || '').split(','))
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+    if (typeof value === 'string') {
+      return value
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+    return [];
+  };
+
   const filter = {};
+  const searchTerm = params.q && String(params.q).trim();
 
   // Text search on product name (case-insensitive, partial match)
-  if (params.q) {
-    filter.name = { $regex: params.q.trim(), $options: 'i' };
+  if (searchTerm) {
+    filter.name = { $regex: searchTerm, $options: 'i' };
   }
 
-  // Category filter (exact match)
-  if (params.category) {
-    filter.category = params.category.trim();
-  }
+  // Category and price filters only apply when there is no text search.
+  if (!searchTerm) {
+    // Category filter (single or multi-select)
+    const categories = toList(params.category);
+    if (categories.length === 1) {
+      filter.category = categories[0];
+    } else if (categories.length > 1) {
+      filter.category = { $in: categories };
+    }
 
-  // Price range
-  const priceFilter = {};
-  if (params.minPrice !== undefined) {
-    const min = Number(params.minPrice);
-    if (!Number.isNaN(min)) priceFilter.$gte = min;
-  }
-  if (params.maxPrice !== undefined) {
-    const max = Number(params.maxPrice);
-    if (!Number.isNaN(max)) priceFilter.$lte = max;
-  }
-  if (Object.keys(priceFilter).length) {
-    filter.price = priceFilter;
+    // Price range
+    const priceFilter = {};
+    if (params.minPrice !== undefined && String(params.minPrice).trim() !== '') {
+      const min = Number(params.minPrice);
+      if (!Number.isNaN(min)) priceFilter.$gte = Math.max(0, min);
+    }
+    if (params.maxPrice !== undefined && String(params.maxPrice).trim() !== '') {
+      const max = Number(params.maxPrice);
+      if (!Number.isNaN(max)) priceFilter.$lte = max;
+    }
+    if (Object.keys(priceFilter).length) {
+      filter.price = priceFilter;
+    }
   }
 
   // Sorting
