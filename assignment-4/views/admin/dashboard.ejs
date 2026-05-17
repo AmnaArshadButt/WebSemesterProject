@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div class="admin-shell">
+      <%- include('./partials/sidebar', { activePage: activePage }) %>
+
+      <main class="admin-main">
+        <header class="admin-header">
+          <div>
+            <p class="admin-eyebrow">Restricted area</p>
+            <h1>Product dashboard</h1>
+            <p class="admin-summary">
+              Monitor inventory and prepare product management workflows from one place.
+            </p>
+          </div>
+        </header>
+
+        <section class="admin-stats" aria-label="Dashboard summary">
+          <article class="stat-card">
+            <span class="stat-label">Products</span>
+            <strong class="stat-value"><%= stats.productCount %></strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Categories</span>
+            <strong class="stat-value"><%= stats.categoryCount %></strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Low stock</span>
+            <strong class="stat-value"><%= stats.lowStockCount %></strong>
+          </article>
+        </section>
+
+        <section class="admin-panel" id="products-table">
+          <div class="panel-heading">
+            <div>
+              <h2>All products</h2>
+              <p>Key inventory details are shown here for quick review.</p>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Category</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (!products.length) { %>
+                  <tr>
+                    <td colspan="4" class="empty-state">No products available yet.</td>
+                  </tr>
+                <% } %>
+
+                <% products.forEach(function(product) { %>
+                  <tr>
+                    <td>
+                      <div class="product-cell">
+                        <span class="product-thumb">
+                          <% if (product.image) { %>
+                            <img src="<%= product.image %>" alt="<%= product.name %>" />
+                          <% } else { %>
+                            <span><%= (product.name || '?').charAt(0) %></span>
+                          <% } %>
+                        </span>
+                        <div>
+                          <strong><%= product.name %></strong>
+                          <small><%= product.description || 'No description provided' %></small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>$<%= Number(product.price || 0).toFixed(2) %></td>
+                    <td><%= product.stock ?? 0 %></td>
+                    <td><%= product.category %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

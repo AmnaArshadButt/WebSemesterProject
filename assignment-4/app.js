@@ -13,6 +13,7 @@ require('dotenv').config();
 const connectDB = require('./config/db');
 const productsRouter = require('./routes/products');
 const categoryRouter = require('./routes/category');
+const adminRouter = require('./routes/admin');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -49,6 +50,7 @@ app.get('/', async (req, res) => {
 // Mount products API / catalog router (phase 1: JSON + pagination skeleton)
 app.use('/products', productsRouter);
 app.use('/categories', categoryRouter);
+app.use('/admin', adminRouter);
 
 // Simple error handler
 app.use((err, req, res, next) => {
