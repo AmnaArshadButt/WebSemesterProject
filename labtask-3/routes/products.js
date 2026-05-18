@@ -48,7 +48,7 @@ router.get('/', async (req, res, next) => {
         ...req.query
       };
 
-      return res.render('products', {
+      return res.render('shop/products', {
         products,
         page,
         totalPages,

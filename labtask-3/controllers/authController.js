@@ -69,7 +69,6 @@ exports.logout = (req, res, next) => {
   req.session.destroy((err) => {
     if (err) return next(err);
     res.clearCookie('connect.sid');
-    req.flash('success', 'You have successfully logged out');
     return res.redirect('/');
   });
 };

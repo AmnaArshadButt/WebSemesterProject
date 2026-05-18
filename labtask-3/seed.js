@@ -6,7 +6,15 @@
 const connectDB = require('./config/db');
 const Category = require('./models/category');
 const Product = require('./models/Product');
+const User = require('./models/User');
 const slugify = require('slugify');
+
+const adminSeed = {
+  name: 'Admin User',
+  email: 'admin@labtask.local',
+  password: 'Admin@12345',
+  role: 'admin'
+};
 
 async function createSampleProducts() {
   // 30 sample products across categories for pagination/filter testing
@@ -85,10 +93,12 @@ async function run() {
     // Clear existing
     await Category.deleteMany({});
     await Product.deleteMany({});
+    await User.deleteOne({ email: adminSeed.email });
     await Category.insertMany(categories);
     // Insert seed data
     await Product.insertMany(products);
-    console.log('Seed completed: inserted', products.length, 'products');
+    await User.create(adminSeed);
+    console.log('Seed completed: inserted', products.length, 'products and 1 admin user');
     process.exit(0);
   } catch (err) {
     console.error('Seeding error:', err);
