@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= mode === 'edit' ? 'Edit Category' : 'Add Category' %></title>
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div class="admin-shell">
+      <%- include('./partials/sidebar', { activePage: 'categories' }) %>
+
+      <main class="admin-main">
+        <header class="admin-header">
+          <div>
+            <p class="admin-eyebrow"><%= mode === 'edit' ? 'Update category' : 'Create category' %></p>
+            <h1><%= mode === 'edit' ? 'Edit category' : 'Add category' %></h1>
+            <p class="admin-summary">Keep category names short and clear so they appear well in the product dropdown.</p>
+          </div>
+          <a class="admin-secondary-link" href="/admin/categories">Back to categories</a>
+        </header>
+
+        <% if (errors && errors.length) { %>
+          <section class="form-alert" aria-live="polite">
+            <strong>Please fix the following:</strong>
+            <ul>
+              <% errors.forEach(function(error) { %>
+                <li><%= error %></li>
+              <% }) %>
+            </ul>
+          </section>
+        <% } %>
+
+        <section class="admin-panel">
+          <form class="category-form-card" action="<%= formAction %>" method="post">
+            <label class="category-field">
+              <span>Category name *</span>
+              <input type="text" name="name" value="<%= category && category.name ? category.name : '' %>" placeholder="Enter category name" />
+            </label>
+
+            <label class="category-field">
+              <span>Description</span>
+              <textarea name="description" rows="5" placeholder="Optional category description"><%= category && category.description ? category.description : '' %></textarea>
+            </label>
+
+            <div class="form-actions">
+              <button class="admin-primary-button" type="submit"><%= mode === 'edit' ? 'Save changes' : 'Create category' %></button>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

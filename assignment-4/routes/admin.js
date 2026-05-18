@@ -40,27 +40,33 @@ const imageUpload = multer({
 });
 
 async function loadAdminViewData() {
-  let categories = await Category.find({}, { name: 1, _id: 0 }).sort({ name: 1 }).lean();
-  categories = categories.map((category) => category.name);
+  // Combine Category docs and product-derived categories so dropdowns always include seeded categories
+  const catDocs = await Category.find({}, { name: 1, _id: 0 }).sort({ name: 1 }).lean();
+  const docNames = catDocs.map((c) => c.name).filter(Boolean);
+  const productNames = await Product.distinct('category').then((items) => (items || []).filter(Boolean));
+  const names = Array.from(new Set([...docNames, ...productNames])).sort((a, b) => a.localeCompare(b));
 
-  if (!categories.length) {
-    categories = await Product.distinct('category');
-  }
-
-  return { categories };
+  return { categories: names };
 }
 
 async function loadCategoryOverview() {
   const categories = await Category.find({}).sort({ name: 1 }).lean();
+  const productCategoryNames = await Product.distinct('category').then((items) => items.filter(Boolean).sort((left, right) => left.localeCompare(right)));
   const productCounts = await Product.aggregate([
     { $match: { category: { $type: 'string', $ne: '' } } },
     { $group: { _id: '$category', productCount: { $sum: 1 }, lowStockCount: { $sum: { $cond: [{ $lte: ['$stock', 5] }, 1, 0] } } } }
   ]);
 
   const countMap = new Map(productCounts.map((entry) => [entry._id, entry]));
+  const categoryMap = new Map(categories.map((category) => [category.name, category]));
+  const categoryNames = Array.from(new Set([
+    ...categories.map((category) => category.name),
+    ...productCategoryNames
+  ])).sort((left, right) => left.localeCompare(right));
 
-  return categories.map((category) => {
-    const stats = countMap.get(category.name) || { productCount: 0, lowStockCount: 0 };
+  return categoryNames.map((name) => {
+    const category = categoryMap.get(name) || { name, slug: name.toLowerCase().trim().replace(/\s+/g, '-') };
+    const stats = countMap.get(name) || { productCount: 0, lowStockCount: 0 };
 
     return {
       ...category,
@@ -177,6 +183,94 @@ router.get('/categories', async (req, res, next) => {
       },
       activePage: 'categories'
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/categories', async (req, res, next) => {
+  try {
+    const name = String(req.body.name || '').trim();
+    const description = String(req.body.description || '').trim();
+
+    if (!name) {
+      const categories = await loadCategoryOverview();
+      const totalProducts = await Product.countDocuments({});
+      return res.status(400).render('admin/category', {
+        categories,
+        stats: {
+          categoryCount: categories.length,
+          productCount: totalProducts,
+          lowStockCount: categories.reduce((total, category) => total + Number(category.lowStockCount || 0), 0)
+        },
+        activePage: 'categories',
+        errors: ['Category name is required']
+      });
+    }
+
+    // Avoid duplicates
+    const exists = await Category.findOne({ name });
+    if (exists) {
+      return res.redirect('/admin/categories');
+    }
+
+    await Category.create({ name, description });
+    return res.redirect('/admin/categories');
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Render edit form for a category
+router.get('/categories/:id/edit', async (req, res, next) => {
+  try {
+    const category = await Category.findById(req.params.id).lean();
+    if (!category) return res.status(404).send('Category not found');
+
+    res.render('admin/category-form', {
+      mode: 'edit',
+      category,
+      formAction: `/admin/categories/${category._id}`,
+      activePage: 'categories',
+      errors: []
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Update category
+router.post('/categories/:id', async (req, res, next) => {
+  try {
+    const category = await Category.findById(req.params.id);
+    if (!category) return res.status(404).send('Category not found');
+
+    const name = String(req.body.name || '').trim();
+    const description = String(req.body.description || '').trim();
+    if (!name) {
+      return res.status(400).render('admin/category-form', {
+        mode: 'edit',
+        category: { ...category.toObject(), name, description },
+        formAction: `/admin/categories/${category._id}`,
+        activePage: 'categories',
+        errors: ['Category name is required']
+      });
+    }
+
+    category.name = name;
+    category.description = description;
+    await category.save();
+    return res.redirect('/admin/categories');
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Delete category
+router.post('/categories/:id/delete', async (req, res, next) => {
+  try {
+    await Category.findByIdAndDelete(req.params.id);
+    return res.redirect('/admin/categories');
   } catch (err) {
     next(err);
   }
