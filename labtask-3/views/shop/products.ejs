@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Products</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/product.css" />
+    <script src="/js/menu.js" defer></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  </head>
+  <body>
+    <div class="divbar">
+      <p class="bar-line">
+        Explore new styles designed for brighter days<span
+          ><strong><pre> <u> right here.</u></pre></strong></span
+        >
+      </p>
+    </div>
+
+    <nav class="nav-bar">
+
+      <button class="menu-toggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="divlogo">
+        <a href="/">
+          <img class="logo-img" src="/images/icons/logo.svg" alt="Khaddi Replica Logo" />
+        </a>
+      </div>
+
+      <div class="nav-menu">
+
+        <ul class="nav-list">
+
+          <li class="nav-list-item"><a href="#">NEW IN</a></li>
+          <li class="nav-list-item2"><a href="#"><strong>FROM RAMADAN TO EID</strong></a></li>
+          <li class="nav-list-item"><a href="#">READY TO WEAR</a></li>
+          <li class="nav-list-item"><a href="#">FABRICS</a></li>
+          <li class="nav-list-item"><a href="#">FRAGNANCES</a></li>
+          <li class="nav-list-item shop-item"><a href="/products"><strong>SHOP</strong></a>
+            <div class="shop-dropdown">
+              <ul>
+                <% (categories || []).forEach(function(cat) { %>
+                  <li><a href="/products?category=<%= encodeURIComponent(cat) %>"><%= cat %></a></li>
+                <% }) %>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-list-item6"><a href="#">SALES</a></li>
+          <li class="nav-list-item"> <a href="#"><strong>NOW HAPPENING</strong></a></li>
+
+        </ul>
+
+      </div>
+
+      <div class="navdiv-icons">
+        <img class="nav-icons" src="/images/icons/search-svgrepo-com.svg" alt="Search Icon" />
+        <img class="nav-icons" src="/images/icons/heart-svgrepo-com.svg" alt="Heart Icon" />
+        <img class="nav-icons" src="/images/icons/user-svgrepo-com.svg" alt="User Icon" />
+        <img
+          class="nav-icons"
+          src="/images/icons/shopping-bag-svgrepo-com.svg"
+          alt="Shopping Bag Icon"
+        />
+      </div>
+    </nav>
+
+    <main class="products-page site-content">
+      <div class="products-hero">
+        <h1>Products</h1>
+        <p class="products-sub">Browse our catalog — use the filters to refine results.</p>
+      </div>
+
+      <div class="products-controls">
+        <form id="filters-form" method="get" action="/products">
+          <input
+            type="text"
+            name="q"
+            placeholder="Search by name"
+            value="<%= filters.q || '' %>"
+          />
+
+          <% const selectedCategory = Array.isArray(filters.category) ? filters.category[0] : (filters.category || ''); %>
+          <select name="category">
+            <option value="">All Categories</option>
+            <% categories.forEach(function(cat) { %>
+              <option value="<%= cat %>" <%= selectedCategory === cat ? 'selected' : '' %>><%= cat %></option>
+            <% }) %>
+          </select>
+
+          <input
+            type="number"
+            name="minPrice"
+            step="0.01"
+            placeholder="Min price"
+            min="0"
+            value="<%= (filters.minPrice !== undefined && filters.minPrice !== '') ? filters.minPrice : '0' %>"
+          />
+          <input
+            type="number"
+            name="maxPrice"
+            step="0.01"
+            placeholder="Max price"
+            value="<%= filters.maxPrice || '' %>"
+          />
+
+          <select name="sort">
+            <option value="">Sort</option>
+            <option value="price_asc" <%= filters.sort === 'price_asc' ? 'selected' : '' %>>Price: Low → High</option>
+            <option value="price_desc" <%= filters.sort === 'price_desc' ? 'selected' : '' %>>Price: High → Low</option>
+            <option value="rating_desc" <%= filters.sort === 'rating_desc' ? 'selected' : '' %>>Rating</option>
+            <option value="name_asc" <%= filters.sort === 'name_asc' ? 'selected' : '' %>>Name A → Z</option>
+          </select>
+          <button type="button" id="reset-filters" class="btn-reset">Reset Filters</button>
+        </form>
+      </div>
+
+      <section class="products-grid">
+        <% if (!products.length) { %>
+          <p>No products found.</p>
+        <% } %>
+
+        <% products.forEach(function(p) { %>
+          <article class="product-card" data-id="<%= p._id %>" data-name="<%= p.name %>" data-price="<%= p.price %>" data-description="<%= (p.description || '').replace(/"/g, '&quot;') %>" data-colors="<%= (p.colors || []).join(',') %>" data-image="<%= p.image %>">
+            <div class="product-image-wrap">
+              <img src="<%= p.image || '/uploads/images/img1.png' %>" alt="<%= p.name %>" class="product-image" />
+              <div class="card-actions">
+                <button class="icon-btn view-btn" type="button" title="View">
+                  <span class="material-icons">visibility</span>
+                </button>
+                <button class="icon-btn cart-btn" type="button" title="Add to cart">
+                  <span class="material-icons">add_shopping_cart</span>
+                </button>
+              </div>
+            </div>
+            <div class="product-info">
+              <h3 class="product-title"><%= p.name %></h3>
+              <p class="product-price"><strong>$<%= p.price.toFixed(2) %></strong></p>
+              <p class="product-meta">Category: <%= p.category %> · Rating: <%= p.rating %> </p>
+            </div>
+          </article>
+        <% }) %>
+      </section>
+
+      <nav class="pagination">
+        <% if (page > 1) { %>
+          <a href="?<%= new URLSearchParams(Object.assign({}, filters, { page: page - 1 })).toString() %>">Previous</a>
+        <% } %>
+
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <% if (i === page) { %>
+            <strong><%= i %></strong>
+          <% } else { %>
+            <a href="?<%= new URLSearchParams(Object.assign({}, filters, { page: i })).toString() %>"><%= i %></a>
+          <% } %>
+        <% } %>
+
+        <% if (page < totalPages) { %>
+          <a href="?<%= new URLSearchParams(Object.assign({}, filters, { page: page + 1 })).toString() %>">Next</a>
+        <% } %>
+      </nav>
+    </main>
+    <!-- Product quick-view modal -->
+    <div id="product-modal" class="product-modal" aria-hidden="true">
+      <div class="product-modal-dialog">
+        <button id="modal-close" class="modal-close" aria-label="Close">&times;</button>
+        <div class="modal-body">
+          <div class="modal-image"><img src="" alt="" id="modal-image"></div>
+          <div class="modal-info">
+            <h2 id="modal-title"></h2>
+            <p id="modal-price"></p>
+            <p id="modal-desc"></p>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/products.js" defer></script>
+  </body>
+</html>

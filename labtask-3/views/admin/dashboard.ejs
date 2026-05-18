@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <script src="/js/admin.js" defer></script>
+  </head>
+  <body>
+    <div class="admin-shell">
+      <%- include('./partials/sidebar', { activePage: activePage }) %>
+
+      <main class="admin-main">
+        <header class="admin-header">
+          <div>
+            <p class="admin-eyebrow">Restricted area</p>
+            <h1>Product dashboard</h1>
+            <p class="admin-summary">
+              Monitor inventory and prepare product management workflows from one place.
+            </p>
+          </div>
+          <a class="admin-primary-link" href="/admin/products/new">Add product</a>
+        </header>
+
+        <section class="admin-stats" aria-label="Dashboard summary">
+          <article class="stat-card">
+            <span class="stat-label">Products</span>
+            <strong class="stat-value"><%= stats.productCount %></strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Categories</span>
+            <strong class="stat-value"><%= stats.categoryCount %></strong>
+          </article>
+          <a class="stat-card stat-card-link" href="/admin/low-stock" aria-label="Open low stock items">
+            <span class="stat-label">Low stock</span>
+            <strong class="stat-value"><%= stats.lowStockCount %></strong>
+            <span class="stat-link-note">View the items that need attention</span>
+          </a>
+        </section>
+
+        <section class="admin-panel" id="products-table">
+          <div class="panel-heading">
+            <div>
+              <h2>All products</h2>
+              <p>Key inventory details are shown here for quick review.</p>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Category</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (!products.length) { %>
+                  <tr>
+                    <td colspan="5" class="empty-state">No products available yet.</td>
+                  </tr>
+                <% } %>
+
+                <% products.forEach(function(product) { %>
+                  <tr>
+                    <td>
+                      <div class="product-cell">
+                        <span class="product-thumb">
+                          <% if (product.image) { %>
+                            <img src="<%= product.image %>" alt="<%= product.name %>" />
+                          <% } else { %>
+                            <span><%= (product.name || '?').charAt(0) %></span>
+                          <% } %>
+                        </span>
+                        <div>
+                          <strong><%= product.name %></strong>
+                          <small><%= product.description || 'No description provided' %></small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>$<%= Number(product.price || 0).toFixed(2) %></td>
+                    <td><%= product.stock ?? 0 %></td>
+                    <td><%= product.category %></td>
+                    <td>
+                      <div class="action-group">
+                        <a class="admin-action-link" href="/admin/products/<%= product._id %>/edit">Edit</a>
+                        <form class="delete-form" action="/admin/products/<%= product._id %>/delete" method="post">
+                          <button class="admin-danger-button" type="submit">Delete</button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
