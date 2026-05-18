@@ -45,6 +45,43 @@
           </a>
         </section>
 
+        <section class="admin-panel">
+          <div class="panel-heading">
+            <div>
+              <h2>Categories</h2>
+              <p>Seeded categories are shown here so the catalog structure is visible at a glance.</p>
+            </div>
+          </div>
+
+          <% if (!categories.length) { %>
+            <div class="empty-state">No categories available yet.</div>
+          <% } else { %>
+            <div class="low-stock-grid">
+              <% categories.forEach(function(category) { %>
+                <article class="low-stock-card">
+                  <div class="low-stock-card-header">
+                    <div>
+                      <strong><%= category.name %></strong>
+                      <small><%= category.description || 'No category description provided.' %></small>
+                    </div>
+                  </div>
+
+                  <dl class="low-stock-meta">
+                    <div>
+                      <dt>Products</dt>
+                      <dd><%= category.productCount %></dd>
+                    </div>
+                    <div>
+                      <dt>Low stock</dt>
+                      <dd><%= category.lowStockCount %></dd>
+                    </div>
+                  </dl>
+                </article>
+              <% }) %>
+            </div>
+          <% } %>
+        </section>
+
         <section class="admin-panel" id="products-table">
           <div class="panel-heading">
             <div>

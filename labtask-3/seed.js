@@ -4,6 +4,7 @@
  * Expects MONGODB_URI in environment or falls back to the default in config/db.js
  */
 const connectDB = require('./config/db');
+const Category = require('./models/category');
 const Product = require('./models/Product');
 const slugify = require('slugify');
 
@@ -65,13 +66,26 @@ async function createSampleProducts() {
   });
 }
 
+function createSeedCategories(products) {
+  const categoryNames = Array.from(new Set(products.map((product) => product.category).filter(Boolean))).sort((left, right) => left.localeCompare(right));
+
+  return categoryNames.map((name) => ({
+    name,
+    slug: slugify(name, { lower: true, strict: true }),
+    description: `Products tagged as ${name}`
+  }));
+}
+
 async function run() {
   await connectDB();
 
   try {
     const products = await createSampleProducts();
+    const categories = createSeedCategories(products);
     // Clear existing
+    await Category.deleteMany({});
     await Product.deleteMany({});
+    await Category.insertMany(categories);
     // Insert seed data
     await Product.insertMany(products);
     console.log('Seed completed: inserted', products.length, 'products');

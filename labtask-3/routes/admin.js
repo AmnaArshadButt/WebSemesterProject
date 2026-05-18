@@ -127,19 +127,16 @@ function validateProductForm(data) {
 router.get('/', async (req, res, next) => {
   try {
     const products = await Product.find({}).sort({ createdAt: -1 }).lean();
-
-    let categoryCount = await Category.countDocuments();
-    if (!categoryCount) {
-      categoryCount = await Product.distinct('category').then((items) => items.filter(Boolean).length);
-    }
+    const categories = await loadCategoryOverview();
 
     const lowStockCount = products.filter((product) => Number(product.stock || 0) <= 5).length;
 
     res.render('admin/dashboard', {
       products,
+      categories,
       stats: {
         productCount: products.length,
-        categoryCount,
+        categoryCount: categories.length,
         lowStockCount
       },
       activePage: 'dashboard'

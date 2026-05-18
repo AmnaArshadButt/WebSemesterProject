@@ -40,10 +40,10 @@ app.get('/', async (req, res) => {
         if (!categories.length) {
             categories = await Product.distinct('category');
         }
-        res.render('index', { categories });
+        res.render('shop/index', { categories });
     } catch (err) {
         console.error('Error fetching categories for index:', err);
-        res.render('index', { categories: [] });
+        res.render('shop/index', { categories: [] });
     }
 });
 
