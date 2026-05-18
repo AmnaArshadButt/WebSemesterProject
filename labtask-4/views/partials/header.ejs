@@ -1,0 +1,68 @@
+<!-- Flash messages -->
+<% const navCategories = typeof categories !== 'undefined' ? categories : []; %>
+<div class="flash-container">
+  <% if (success && success.length) { %>
+    <div class="flash flash-success"><%= success[0] %></div>
+  <% } %>
+  <% if (error && error.length) { %>
+    <div class="flash flash-error"><%= error[0] %></div>
+  <% } %>
+</div>
+
+<div class="top-auth-bar">
+  <div class="top-auth-links">
+    <% if (currentUser) { %>
+      <a href="/logout">Logout</a>
+      <% if (currentUser.role === 'admin') { %>
+        <a href="/admin">Admin Dashboard</a>
+      <% } %>
+    <% } else { %>
+      <a href="/login">Login</a>
+      <a href="/register">Register</a>
+    <% } %>
+  </div>
+</div>
+
+<nav class="nav-bar">
+  <button class="menu-toggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <div class="divlogo">
+    <a href="/">
+      <img class="logo-img" src="/images/icons/logo.svg" alt="Logo" />
+    </a>
+  </div>
+
+  <div class="nav-menu">
+    <ul class="nav-list">
+      <li class="nav-list-item"><a href="#">NEW IN</a></li>
+      <li class="nav-list-item2"><a href="#"><strong>FROM RAMADAN TO EID</strong></a></li>
+      <li class="nav-list-item"><a href="#">READY TO WEAR</a></li>
+      <li class="nav-list-item"><a href="#">FABRICS</a></li>
+      <li class="nav-list-item"><a href="#">FRAGNANCES</a></li>
+      <li class="nav-list-item shop-item"><a href="/products"><strong>SHOP</strong></a>
+        <div class="shop-dropdown">
+          <ul>
+            <% navCategories.forEach(function(cat) { %>
+              <li><a href="/products?category=<%= encodeURIComponent(cat) %>"><%= cat %></a></li>
+            <% }) %>
+          </ul>
+        </div>
+      </li>
+      <li class="nav-list-item6"><a href="#">SALES</a></li>
+      <li class="nav-list-item"><a href="#"><strong>NOW HAPPENING</strong></a></li>
+    </ul>
+  </div>
+
+  <div class="navdiv-icons">
+    <img class="nav-icons" src="/images/icons/search-svgrepo-com.svg" alt="Search" />
+    <img class="nav-icons" src="/images/icons/heart-svgrepo-com.svg" alt="Wishlist" />
+    <img class="nav-icons" src="/images/icons/user-svgrepo-com.svg" alt="User" />
+    <a class="nav-link" href="/checkout" aria-label="Checkout">
+      <img class="nav-icons" src="/images/icons/bag.svg" alt="Cart" />
+    </a>
+  </div>
+</nav>

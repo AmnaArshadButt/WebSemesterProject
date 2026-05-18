@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin - Categories</title>
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div class="admin-shell">
+      <%- include('./partials/sidebar', { activePage: activePage }) %>
+
+      <main class="admin-main">
+        <header class="admin-header">
+          <div>
+            <p class="admin-eyebrow">Category overview</p>
+            <h1>Categories</h1>
+            <p class="admin-summary">
+              Review the current catalog structure and identify categories that need more products or attention.
+            </p>
+          </div>
+          <a class="admin-secondary-link" href="/admin">Back to dashboard</a>
+        </header>
+
+        <section class="admin-stats" aria-label="Category summary">
+          <article class="stat-card">
+            <span class="stat-label">Categories</span>
+            <strong class="stat-value"><%= stats.categoryCount %></strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Products</span>
+            <strong class="stat-value"><%= stats.productCount %></strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Low stock items</span>
+            <strong class="stat-value"><%= stats.lowStockCount %></strong>
+          </article>
+        </section>
+
+        <section class="admin-panel">
+          <div class="panel-heading">
+            <div>
+              <h2>Category cards</h2>
+              <p>Each card shows how many products belong to the category and how many are low stock.</p>
+            </div>
+            <form class="category-create-form" action="/admin/categories" method="post">
+              <label class="category-field">
+                <span>Category name</span>
+                <input type="text" name="name" placeholder="Enter category name" />
+              </label>
+              <label class="category-field">
+                <span>Description</span>
+                <textarea name="description" rows="3" placeholder="Optional description"></textarea>
+              </label>
+              <div>
+                <button class="admin-primary-button" type="submit">Create</button>
+              </div>
+            </form>
+          </div>
+          <% if (typeof errors !== 'undefined' && errors && errors.length) { %>
+            <div class="form-alert">
+              <strong>Please fix:</strong>
+              <ul>
+                <% errors.forEach(function(error) { %>
+                  <li><%= error %></li>
+                <% }) %>
+              </ul>
+            </div>
+          <% } %>
+
+          <% if (!categories.length) { %>
+            <div class="empty-callout">No categories are available yet.</div>
+          <% } else { %>
+            <div class="low-stock-grid">
+              <% categories.forEach(function(category) { %>
+                <article class="low-stock-card">
+                  <div class="low-stock-card-header">
+                    <div>
+                      <strong><%= category.name %></strong>
+                      <small><%= category.description || 'No category description provided.' %></small>
+                    </div>
+                  </div>
+
+                  <dl class="low-stock-meta">
+                    <div>
+                      <dt>Products</dt>
+                      <dd><%= category.productCount %></dd>
+                    </div>
+                    <div>
+                      <dt>Low stock</dt>
+                      <dd><%= category.lowStockCount %></dd>
+                    </div>
+                    <div>
+                      <dt>Actions</dt>
+                      <dd class="category-action-group">
+                        <a class="admin-action-link" href="/admin/categories/<%= category._id %>/edit">Edit</a>
+                        <form class="delete-form" action="/admin/categories/<%= category._id %>/delete" method="post">
+                          <button class="admin-danger-button" type="submit">Delete</button>
+                        </form>
+                      </dd>
+                    </div>
+                  </dl>
+                </article>
+              <% }) %>
+            </div>
+          <% } %>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,29 @@
+<aside class="admin-sidebar">
+  <div class="brand-block">
+    <p class="brand-label">E-Commerce Admin</p>
+    <h2>Management Panel</h2>
+  </div>
+
+  <nav class="admin-nav" aria-label="Admin navigation">
+    <a class="admin-link <%= activePage === 'dashboard' ? 'is-active' : '' %>" href="/admin">
+      Dashboard
+    </a>
+    <a class="admin-link <%= activePage === 'products' ? 'is-active' : '' %>" href="/admin/products-view">
+      Catalog
+    </a>
+    <a class="admin-link <%= activePage === 'categories' ? 'is-active' : '' %>" href="/admin/categories">
+      Categories
+    </a>
+    <a class="admin-link <%= activePage === 'low-stock' ? 'is-active' : '' %>" href="/admin/low-stock">
+      Low stock
+    </a>
+    <a class="admin-link <%= activePage === 'storefront' ? 'is-active' : '' %>" href="/admin/storefront-view">
+      Storefront
+    </a>
+
+    <div class="admin-nav-section">Management</div>
+    <a class="admin-link" href="/admin/products/new">Add product</a>
+    <a class="admin-link" href="/logout">Logout</a>
+    
+  </nav>
+</aside>
