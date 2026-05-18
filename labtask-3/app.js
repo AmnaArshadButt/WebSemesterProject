@@ -6,6 +6,9 @@
  */
 const express = require('express');
 const path = require('path');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const flash = require('connect-flash');
 
 // Load environment variables from .env
 require('dotenv').config();
@@ -30,27 +33,64 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Sessions (stored in MongoDB) + flash messages
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'devsecret',
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI || 'mongodb://localhost:27017/khadi-replica', collectionName: 'sessions' }),
+    cookie: { maxAge: 1000 * 60 * 60 * 24 }
+}));
+
+app.use(flash());
+
+// Expose flash messages and current user to views
+const User = require('./models/User');
+app.use(async (req, res, next) => {
+    try {
+        if (req.session && req.session.userId) {
+            // attach full user to req.user for middleware convenience
+            req.user = await User.findById(req.session.userId).lean();
+            res.locals.currentUser = req.user;
+        } else {
+            res.locals.currentUser = null;
+        }
+        res.locals.success = req.flash('success');
+        res.locals.error = req.flash('error');
+        next();
+    } catch (err) {
+        next(err);
+    }
+});
+
 // Basic landing page (existing)
 const Product = require('./models/Product');
 const Category = require('./models/category');
-app.get('/', async (req, res) => {
+app.get('/', async (req, res, next) => {
     try {
         // Fetch distinct categories for navbar dropdown
         let categories = (await Category.find({}, { name: 1, _id: 0 }).sort({ name: 1 }).lean()).map((cat) => cat.name);
         if (!categories.length) {
             categories = await Product.distinct('category');
         }
-        res.render('index', { categories });
+        // Render the shop index view (project uses views/shop/index.ejs)
+        res.render('shop/index', { categories });
     } catch (err) {
         console.error('Error fetching categories for index:', err);
-        res.render('index', { categories: [] });
+        return next(err);
     }
 });
 
-// Mount products API / catalog router (phase 1: JSON + pagination skeleton)
+// Mount routers
 app.use('/products', productsRouter);
 app.use('/categories', categoryRouter);
 app.use('/admin', adminRouter);
+
+// Auth and checkout
+const authRouter = require('./routes/auth');
+const checkoutRouter = require('./routes/checkout');
+app.use(authRouter);
+app.use('/checkout', checkoutRouter);
 
 // Simple error handler
 app.use((err, req, res, next) => {

@@ -5,8 +5,12 @@ const fs = require('fs/promises');
 
 const Product = require('../models/Product');
 const Category = require('../models/category');
+const { isAdmin } = require('../middlewares/auth');
 
 const router = express.Router();
+
+// Protect all admin routes with isAdmin middleware
+router.use(isAdmin);
 
 const uploadDirectory = path.join(__dirname, '..', 'public', 'uploads', 'products');
 
