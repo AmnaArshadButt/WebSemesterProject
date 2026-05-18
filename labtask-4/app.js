@@ -17,6 +17,7 @@ const connectDB = require('./config/db');
 const productsRouter = require('./routes/products');
 const categoryRouter = require('./routes/category');
 const adminRouter = require('./routes/admin');
+const apiV1Router = require('./routes/api/v1');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -85,6 +86,7 @@ app.get('/', async (req, res, next) => {
 app.use('/products', productsRouter);
 app.use('/categories', categoryRouter);
 app.use('/admin', adminRouter);
+app.use('/api/v1', apiV1Router);
 
 // Auth and checkout
 const authRouter = require('./routes/auth');
