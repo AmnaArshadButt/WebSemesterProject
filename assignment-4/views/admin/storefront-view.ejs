@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin - Storefront Preview</title>
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div class="admin-shell">
+      <%- include('./partials/sidebar', { activePage: activePage }) %>
+
+      <main class="admin-main">
+        <header class="admin-header">
+          <div>
+            <p class="admin-eyebrow">Storefront</p>
+            <h1>Storefront Preview</h1>
+            <p class="admin-summary">A quick preview of what customers see on the storefront (simplified).</p>
+          </div>
+        </header>
+
+        <section class="admin-panel storefront-grid">
+          <div class="preview-controls">
+            <button type="button" class="admin-primary-button preview-btn" data-src="/">Storefront</button>
+            <button type="button" class="admin-secondary-link preview-btn" data-src="/products">Catalog</button>
+          </div>
+
+          <div class="preview-frame-wrap">
+            <iframe id="preview-frame" class="preview-iframe" src="/" title="Storefront preview"></iframe>
+          </div>
+
+          <script>
+            (function() {
+              var buttons = document.querySelectorAll('.preview-btn');
+              var iframe = document.getElementById('preview-frame');
+              buttons.forEach(function(b) {
+                b.addEventListener('click', function() {
+                  var src = b.getAttribute('data-src');
+                  iframe.setAttribute('src', src);
+                });
+              });
+            })();
+          </script>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

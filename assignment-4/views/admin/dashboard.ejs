@@ -38,10 +38,11 @@
             <span class="stat-label">Categories</span>
             <strong class="stat-value"><%= stats.categoryCount %></strong>
           </article>
-          <article class="stat-card">
+          <a class="stat-card stat-card-link" href="/admin/low-stock" aria-label="Open low stock items">
             <span class="stat-label">Low stock</span>
             <strong class="stat-value"><%= stats.lowStockCount %></strong>
-          </article>
+            <span class="stat-link-note">View the items that need attention</span>
+          </a>
         </section>
 
         <section class="admin-panel" id="products-table">

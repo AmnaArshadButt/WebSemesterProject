@@ -50,6 +50,26 @@ async function loadAdminViewData() {
   return { categories };
 }
 
+async function loadCategoryOverview() {
+  const categories = await Category.find({}).sort({ name: 1 }).lean();
+  const productCounts = await Product.aggregate([
+    { $match: { category: { $type: 'string', $ne: '' } } },
+    { $group: { _id: '$category', productCount: { $sum: 1 }, lowStockCount: { $sum: { $cond: [{ $lte: ['$stock', 5] }, 1, 0] } } } }
+  ]);
+
+  const countMap = new Map(productCounts.map((entry) => [entry._id, entry]));
+
+  return categories.map((category) => {
+    const stats = countMap.get(category.name) || { productCount: 0, lowStockCount: 0 };
+
+    return {
+      ...category,
+      productCount: stats.productCount,
+      lowStockCount: stats.lowStockCount
+    };
+  });
+}
+
 function buildProductFormData(body = {}, existingProduct = null) {
   return {
     name: String(body.name ?? existingProduct?.name ?? '').trim(),
@@ -113,6 +133,89 @@ router.get('/', async (req, res, next) => {
         lowStockCount
       },
       activePage: 'dashboard'
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/low-stock', async (req, res, next) => {
+  try {
+    const products = await Product.find({}).sort({ stock: 1, createdAt: -1 }).lean();
+    const lowStockProducts = products.filter((product) => Number(product.stock || 0) <= 5);
+
+    let categoryCount = await Category.countDocuments();
+    if (!categoryCount) {
+      categoryCount = await Product.distinct('category').then((items) => items.filter(Boolean).length);
+    }
+
+    res.render('admin/low-stock', {
+      lowStockProducts,
+      stats: {
+        productCount: products.length,
+        categoryCount,
+        lowStockCount: lowStockProducts.length
+      },
+      activePage: 'low-stock'
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/categories', async (req, res, next) => {
+  try {
+    const categories = await loadCategoryOverview();
+    const totalProducts = await Product.countDocuments({});
+
+    res.render('admin/category', {
+      categories,
+      stats: {
+        categoryCount: categories.length,
+        productCount: totalProducts,
+        lowStockCount: categories.reduce((total, category) => total + Number(category.lowStockCount || 0), 0)
+      },
+      activePage: 'categories'
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Admin view: render storefront inside admin layout
+router.get('/storefront-view', async (req, res, next) => {
+  try {
+    // Minimal data for storefront preview
+    const products = await Product.find({}).sort({ createdAt: -1 }).limit(12).lean();
+    const categories = await Category.find({}, { name: 1, _id: 0 }).sort({ name: 1 }).lean().then((c) => c.map((x) => x.name));
+
+    res.render('admin/storefront-view', {
+      products,
+      categories,
+      activePage: 'storefront'
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Admin view: render product catalog inside admin layout
+router.get('/products-view', async (req, res, next) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = 12;
+    const skip = (page - 1) * limit;
+
+    const total = await Product.countDocuments({});
+    const products = await Product.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit).lean();
+    const totalPages = Math.ceil(total / limit) || 1;
+
+    res.render('admin/products-view', {
+      products,
+      page,
+      totalPages,
+      total,
+      activePage: 'products'
     });
   } catch (err) {
     next(err);

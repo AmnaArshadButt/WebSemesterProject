@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin - Products</title>
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div class="admin-shell">
+      <%- include('./partials/sidebar', { activePage: activePage }) %>
+
+      <main class="admin-main">
+        <header class="admin-header">
+          <div>
+            <p class="admin-eyebrow">Store Catalog</p>
+            <h1>Store Catalog</h1>
+            <p class="admin-summary">Preview and browse the store catalog while keeping admin navigation available.</p>
+          </div>
+          <a class="admin-primary-link" href="/admin/products/new">Add product</a>
+        </header>
+
+        <section class="admin-panel">
+          <div class="table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Category</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (!products.length) { %>
+                  <tr>
+                    <td colspan="4" class="empty-state">No products available.</td>
+                  </tr>
+                <% } %>
+
+                <% products.forEach(function(product) { %>
+                  <tr>
+                    <td>
+                      <div class="product-cell">
+                        <span class="product-thumb">
+                          <% if (product.image) { %>
+                            <img src="<%= product.image %>" alt="<%= product.name %>" />
+                          <% } else { %>
+                            <span><%= (product.name || '?').charAt(0) %></span>
+                          <% } %>
+                        </span>
+                        <div>
+                          <strong><%= product.name %></strong>
+                          <small><%= product.description || '' %></small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>$<%= Number(product.price || 0).toFixed(2) %></td>
+                    <td><%= product.stock ?? 0 %></td>
+                    <td><%= product.category %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+
+            <nav class="pagination admin-pagination">
+              <% if (page > 1) { %>
+                <a href="?page=<%= page - 1 %>">Previous</a>
+              <% } %>
+
+              <% for (let i = 1; i <= totalPages; i++) { %>
+                <% if (i === page) { %>
+                  <strong><%= i %></strong>
+                <% } else { %>
+                  <a href="?page=<%= i %>"><%= i %></a>
+                <% } %>
+              <% } %>
+
+              <% if (page < totalPages) { %>
+                <a href="?page=<%= page + 1 %>">Next</a>
+              <% } %>
+            </nav>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
