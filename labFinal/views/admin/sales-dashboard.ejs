@@ -236,7 +236,7 @@
         <div class="metrics-grid" id="metrics-container">
       <div class="metric-card revenue">
         <div class="metric-label">Total Revenue</div>
-        <div class="metric-value" id="total-revenue">$0.00</div>
+          <div class="metric-value" id="total-revenue">$<%= initialData.totalRevenue.toFixed(2) %></div>
         <div class="metric-change">from <%= initialData.totalOrders %> orders</div>
       </div>
 
@@ -248,7 +248,7 @@
 
       <div class="metric-card average">
         <div class="metric-label">Average Order Value</div>
-        <div class="metric-value" id="average-order-value">$0.00</div>
+        <div class="metric-value" id="average-order-value">$<%= initialData.averageOrderValue.toFixed(2) %></div>
         <div class="summary-text">Per order average</div>
       </div>
 
@@ -335,188 +335,185 @@
           <!-- Populated by JavaScript -->
         </tbody>
       </table>
-      </div>
-    </main>
-  </div>
+    </div>
+  </main>
+</div>
 
-  <script src="/js/admin.js" defer></script>
-    let revenueChart = null;
-    let statusChart = null;
-    let autoRefreshEnabled = true;
-    let autoRefreshInterval = null;
+<script src="/js/admin.js" defer></script>
+<script>
+  let revenueChart = null;
+  let statusChart = null;
+  let autoRefreshInterval = null;
 
-    $(document).ready(function() {
-      // Initial load
-      updateDashboard();
+  $(document).ready(function() {
+    updateDashboard();
 
-      // Setup auto-refresh toggle
-      $('#auto-refresh').on('change', function() {
-        autoRefreshEnabled = $(this).is(':checked');
-        if (autoRefreshEnabled) {
-          startAutoRefresh();
-        } else {
-          stopAutoRefresh();
-        }
-      });
-
-      // Start auto-refresh
-      startAutoRefresh();
+    $('#auto-refresh').on('change', function() {
+      if ($(this).is(':checked')) {
+        startAutoRefresh();
+      } else {
+        stopAutoRefresh();
+      }
     });
 
-    function startAutoRefresh() {
-      if (autoRefreshInterval) clearInterval(autoRefreshInterval);
-      autoRefreshInterval = setInterval(updateDashboard, 10000); // 10 seconds
-    }
+    startAutoRefresh();
+  });
 
-    function stopAutoRefresh() {
-      if (autoRefreshInterval) clearInterval(autoRefreshInterval);
-    }
+  function startAutoRefresh() {
+    if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+    autoRefreshInterval = setInterval(updateDashboard, 10000);
+  }
 
-    function manualRefresh() {
-      updateDashboard();
-    }
+  function stopAutoRefresh() {
+    if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+  }
 
-    function updateDashboard() {
-      $.ajax({
-        url: '/sales/api/data',
-        type: 'GET',
-        dataType: 'json',
-        success: function(data) {
-          updateMetrics(data);
-          updateCharts(data);
-          updateRecentOrders(data);
-          updateLastUpdatedTime();
-        },
-        error: function(xhr, status, error) {
-          console.error('Error fetching sales data:', error);
-        }
-      });
-    }
+  function manualRefresh() {
+    updateDashboard();
+  }
 
-    function updateMetrics(data) {
-      $('#total-revenue').text('$' + parseFloat(data.totalRevenue).toFixed(2));
-      $('#total-orders').text(data.totalOrders);
-      $('#average-order-value').text('$' + parseFloat(data.averageOrderValue).toFixed(2));
-
-      if (data.topProducts && data.topProducts.length > 0) {
-        const topProduct = data.topProducts[0];
-        $('#top-product').text(topProduct.productName);
-        $('#top-product-units').text(topProduct.totalSold + ' units sold');
+  function updateDashboard() {
+    $.ajax({
+      url: '/sales/api/data',
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+        updateMetrics(data);
+        updateCharts(data);
+        updateRecentOrders(data);
+        updateLastUpdatedTime();
+      },
+      error: function(xhr, status, error) {
+        console.error('Error fetching sales data:', error);
       }
+    });
+  }
+
+  function updateMetrics(data) {
+    $('#total-revenue').text('$' + parseFloat(data.totalRevenue).toFixed(2));
+    $('#total-orders').text(data.totalOrders);
+    $('#average-order-value').text('$' + parseFloat(data.averageOrderValue).toFixed(2));
+
+    if (data.topProducts && data.topProducts.length > 0) {
+      const topProduct = data.topProducts[0];
+      $('#top-product').text(topProduct.productName);
+      $('#top-product-units').text(topProduct.totalSold + ' units sold');
+    } else {
+      $('#top-product').text('-');
+      $('#top-product-units').text('-');
     }
+  }
 
-    function updateCharts(data) {
-      // Revenue Chart
-      if (data.dailyRevenue && data.dailyRevenue.length > 0) {
-        const dates = data.dailyRevenue.map(d => d.date);
-        const revenues = data.dailyRevenue.map(d => d.revenue);
+  function updateCharts(data) {
+    if (data.dailyRevenue && data.dailyRevenue.length > 0) {
+      const dates = data.dailyRevenue.map(d => d.date);
+      const revenues = data.dailyRevenue.map(d => d.revenue);
+      const ctx = document.getElementById('revenueChart');
 
-        const ctx = document.getElementById('revenueChart');
-        if (revenueChart) {
-          revenueChart.data.labels = dates;
-          revenueChart.data.datasets[0].data = revenues;
-          revenueChart.update();
-        } else {
-          revenueChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-              labels: dates,
-              datasets: [{
-                label: 'Daily Revenue',
-                data: revenues,
-                borderColor: '#4caf50',
-                backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                tension: 0.4,
-                fill: true
-              }]
+      if (revenueChart) {
+        revenueChart.data.labels = dates;
+        revenueChart.data.datasets[0].data = revenues;
+        revenueChart.update();
+      } else {
+        revenueChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: dates,
+            datasets: [{
+              label: 'Daily Revenue',
+              data: revenues,
+              borderColor: '#4caf50',
+              backgroundColor: 'rgba(76, 175, 80, 0.1)',
+              tension: 0.4,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top'
+              }
             },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  display: true,
-                  position: 'top'
-                }
-              },
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  ticks: {
-                    callback: function(value) {
-                      return '$' + value.toFixed(0);
-                    }
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(value) {
+                    return '$' + value.toFixed(0);
                   }
                 }
               }
             }
-          });
-        }
+          }
+        });
       }
+    }
 
-      // Order Status Chart
-      if (data.orderStatus && data.orderStatus.length > 0) {
-        const statuses = data.orderStatus.map(s => s._id);
-        const counts = data.orderStatus.map(s => s.count);
-        const colors = ['#fff3cd', '#d1ecf1', '#d4edda', '#d4edda', '#f8d7da'];
+    if (data.orderStatus && data.orderStatus.length > 0) {
+      const statuses = data.orderStatus.map(s => s._id);
+      const counts = data.orderStatus.map(s => s.count);
+      const colors = ['#fff3cd', '#d1ecf1', '#d4edda', '#cfe2ff', '#f8d7da'];
+      const statusCtx = document.getElementById('statusChart');
 
-        const statusCtx = document.getElementById('statusChart');
-        if (statusChart) {
-          statusChart.data.labels = statuses;
-          statusChart.data.datasets[0].data = counts;
-          statusChart.update();
-        } else {
-          statusChart = new Chart(statusCtx, {
-            type: 'doughnut',
-            data: {
-              labels: statuses,
-              datasets: [{
-                data: counts,
-                backgroundColor: colors
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  position: 'bottom'
-                }
+      if (statusChart) {
+        statusChart.data.labels = statuses;
+        statusChart.data.datasets[0].data = counts;
+        statusChart.update();
+      } else {
+        statusChart = new Chart(statusCtx, {
+          type: 'doughnut',
+          data: {
+            labels: statuses,
+            datasets: [{
+              data: counts,
+              backgroundColor: colors
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom'
               }
             }
-          });
-        }
-      }
-    }
-
-    function updateRecentOrders(data) {
-      const tbody = $('#recent-orders-table tbody');
-      tbody.empty();
-
-      if (data.recentOrders && data.recentOrders.length > 0) {
-        data.recentOrders.forEach(order => {
-          const date = new Date(order.createdAt).toLocaleDateString();
-          tbody.append(`
-            <tr>
-              <td>${order.id}</td>
-              <td>${order.user.name}</td>
-              <td>${order.itemCount} item(s)</td>
-              <td>$${order.totalAmount.toFixed(2)}</td>
-              <td><span class="status-badge ${order.status}">${order.status}</span></td>
-              <td>${date}</td>
-            </tr>
-          `);
+          }
         });
-      } else {
-        tbody.append('<tr><td colspan="6" style="text-align: center; color: #999;">No orders yet</td></tr>');
       }
     }
+  }
 
-    function updateLastUpdatedTime() {
-      const now = new Date();
-      const time = now.toLocaleTimeString();
-      $('#last-updated-time').text(time);
+  function updateRecentOrders(data) {
+    const tbody = $('#recent-orders-table tbody');
+    tbody.empty();
+
+    if (data.recentOrders && data.recentOrders.length > 0) {
+      data.recentOrders.forEach(order => {
+        const date = new Date(order.createdAt).toLocaleDateString();
+        const customerName = order.user && order.user.name ? order.user.name : 'Guest';
+
+        tbody.append(`
+          <tr>
+            <td>${order.id}</td>
+            <td>${customerName}</td>
+            <td>${order.itemCount} item(s)</td>
+            <td>$${parseFloat(order.totalAmount).toFixed(2)}</td>
+            <td><span class="status-badge ${order.status}">${order.status}</span></td>
+            <td>${date}</td>
+          </tr>
+        `);
+      });
+    } else {
+      tbody.append('<tr><td colspan="6" style="text-align: center; color: #999;">No orders yet</td></tr>');
     }
-  </script>
+  }
+
+  function updateLastUpdatedTime() {
+    $('#last-updated-time').text(new Date().toLocaleTimeString());
+  }
+</script>
 </body>
 </html>

@@ -205,9 +205,10 @@
             <div class="order-body">
               <div class="order-items">
                 <% order.items.forEach(item => { %>
+                  <% const product = item.product || {}; %>
                   <div class="order-item-mini">
-                    <img src="<%= item.product.image || '/uploads/images/img1.png' %>" alt="<%= item.product.name %>" />
-                    <span><strong><%= item.product.name %></strong></span>
+                    <img src="<%= product.image || '/uploads/images/img1.png' %>" alt="<%= product.name || item.name %>" />
+                    <span><strong><%= product.name || item.name %></strong></span>
                     <span>Qty: <%= item.quantity %></span>
                   </div>
                 <% }); %>
@@ -220,7 +221,7 @@
                 </div>
                 <div class="order-info-item">
                   <strong>Shipping Address</strong>
-                  <%= order.shippingAddress.substring(0, 50) %>...
+                  <%= order.shippingAddress ? order.shippingAddress.substring(0, 50) : 'N/A' %><%= order.shippingAddress && order.shippingAddress.length > 50 ? '...' : '' %>
                 </div>
                 <div class="order-info-item">
                   <strong>Payment Method</strong>

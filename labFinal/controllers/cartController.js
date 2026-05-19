@@ -23,6 +23,7 @@ const addToCart = async (req, res) => {
   try {
     const { productId, quantity } = req.body;
     const cart = ensureCart(req);
+    const requestedQuantity = parseInt(quantity, 10) || 1;
 
     // Find product to get details
     const product = await Product.findById(productId).lean();
@@ -30,12 +31,27 @@ const addToCart = async (req, res) => {
       return res.status(404).json({ error: 'Product not found' });
     }
 
+    if (Number(product.stock || 0) <= 0) {
+      return res.status(409).json({
+        success: false,
+        error: `Sorry, ${product.name} is out of stock.`
+      });
+    }
+
     // Check if product already in cart
     const cartItem = cart.find(item => item.product.toString() === productId);
 
+    const existingQuantity = cartItem ? Number(cartItem.quantity || 0) : 0;
+    if (existingQuantity + requestedQuantity > Number(product.stock || 0)) {
+      return res.status(409).json({
+        success: false,
+        error: `Only ${product.stock} unit${product.stock === 1 ? '' : 's'} of ${product.name} left in stock.`
+      });
+    }
+
     if (cartItem) {
       // Update quantity
-      cartItem.quantity += parseInt(quantity, 10) || 1;
+      cartItem.quantity = existingQuantity + requestedQuantity;
     } else {
       // Add new item to cart
       cart.push({
@@ -43,7 +59,7 @@ const addToCart = async (req, res) => {
         name: product.name,
         price: product.price,
         image: product.image,
-        quantity: parseInt(quantity, 10) || 1
+        quantity: requestedQuantity
       });
     }
 

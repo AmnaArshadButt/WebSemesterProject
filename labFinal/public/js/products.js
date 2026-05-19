@@ -300,11 +300,10 @@ document.addEventListener('DOMContentLoaded', function () {
       })
     })
     .then(response => {
-      if (!response.ok) throw new Error('Failed to add to cart');
-      return response.json();
+      return response.json().then(data => ({ ok: response.ok, data }));
     })
-    .then(data => {
-      if (data.success) {
+    .then(({ ok, data }) => {
+      if (ok && data.success) {
         // Visual feedback
         if (btnElement) {
           btnElement.classList.add('added');
