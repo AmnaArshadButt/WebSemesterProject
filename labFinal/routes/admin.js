@@ -5,6 +5,7 @@ const fs = require('fs/promises');
 
 const Product = require('../models/Product');
 const Category = require('../models/category');
+const Order = require('../models/Order');
 const { isAdmin } = require('../middlewares/auth');
 
 const router = express.Router();
@@ -80,6 +81,53 @@ async function loadCategoryOverview() {
   });
 }
 
+async function buildAdminDashboardData() {
+  const products = await Product.find({}).sort({ createdAt: -1 }).lean();
+  const categories = await loadCategoryOverview();
+  const salesSummary = await Order.aggregate([
+    {
+      $facet: {
+        summary: [
+          {
+            $group: {
+              _id: null,
+              totalRevenue: { $sum: '$totalAmount' },
+              totalOrders: { $sum: 1 }
+            }
+          }
+        ],
+        itemTotals: [
+          { $unwind: '$items' },
+          {
+            $group: {
+              _id: null,
+              totalItemsSold: { $sum: '$items.quantity' }
+            }
+          }
+        ]
+      }
+    }
+  ]);
+
+  const lowStockCount = products.filter((product) => Number(product.stock || 0) <= 5).length;
+  const summary = salesSummary[0] || { summary: [], itemTotals: [] };
+  const revenueStats = summary.summary[0] || { totalRevenue: 0, totalOrders: 0 };
+  const itemStats = summary.itemTotals[0] || { totalItemsSold: 0 };
+
+  return {
+    products,
+    categories,
+    stats: {
+      productCount: products.length,
+      categoryCount: categories.length,
+      lowStockCount,
+      totalRevenue: Number(revenueStats.totalRevenue || 0).toFixed(2),
+      totalOrders: Number(revenueStats.totalOrders || 0),
+      totalItemsSold: Number(itemStats.totalItemsSold || 0)
+    }
+  };
+}
+
 function buildProductFormData(body = {}, existingProduct = null) {
   return {
     name: String(body.name ?? existingProduct?.name ?? '').trim(),
@@ -126,21 +174,23 @@ function validateProductForm(data) {
 
 router.get('/', async (req, res, next) => {
   try {
-    const products = await Product.find({}).sort({ createdAt: -1 }).lean();
-    const categories = await loadCategoryOverview();
-
-    const lowStockCount = products.filter((product) => Number(product.stock || 0) <= 5).length;
+    const dashboardData = await buildAdminDashboardData();
 
     res.render('admin/dashboard', {
-      products,
-      categories,
-      stats: {
-        productCount: products.length,
-        categoryCount: categories.length,
-        lowStockCount
-      },
+      products: dashboardData.products,
+      categories: dashboardData.categories,
+      stats: dashboardData.stats,
       activePage: 'dashboard'
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/api/dashboard-data', async (req, res, next) => {
+  try {
+    const dashboardData = await buildAdminDashboardData();
+    res.json(dashboardData);
   } catch (err) {
     next(err);
   }

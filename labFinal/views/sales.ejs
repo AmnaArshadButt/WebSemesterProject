@@ -212,6 +212,55 @@
     gap: 12px;
   }
 
+  .refresh-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(29, 22, 13, 0.08);
+    color: #1d160d;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .refresh-status.is-refreshing {
+    background: rgba(29, 22, 13, 0.92);
+    color: #fff;
+    animation: pulse 1.1s infinite ease-in-out;
+  }
+
+  .refresh-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 0 0 currentColor;
+  }
+
+  .refresh-status.is-refreshing .refresh-dot {
+    animation: blink 1.1s infinite ease-in-out;
+  }
+
+  .refresh-timestamp {
+    display: block;
+    margin-top: 10px;
+    color: #6f6557;
+    font-size: 13px;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-1px); }
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 0.45; }
+    50% { opacity: 1; }
+  }
+
   .refresh-btn {
     border: 0;
     border-radius: 999px;
@@ -375,12 +424,17 @@
       <div class="card-header">
         <h2>Revenue Trend</h2>
         <div class="toolbar">
+          <span id="refresh-status" class="refresh-status" aria-live="polite">
+            <span class="refresh-dot"></span>
+            <span id="refresh-status-text">Up to date</span>
+          </span>
           <button class="refresh-btn" type="button" onclick="manualRefresh()">Refresh</button>
         </div>
       </div>
       <div class="chart-box">
         <canvas id="revenueChart"></canvas>
       </div>
+      <span id="refresh-timestamp" class="refresh-timestamp">Last updated: just now</span>
       <div class="revenue-list" style="margin-top: 18px;">
         <% (initialData.dailyRevenue || []).slice(-5).forEach(point => { %>
           <div class="mini-row">
@@ -470,15 +524,18 @@
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script id="initial-sales-data" type="application/json"><%- JSON.stringify(chartData) %></script>
 <script>
-  const initialSalesData = <%- JSON.stringify(chartData) %>;
+  const initialSalesData = JSON.parse(document.getElementById('initial-sales-data').textContent);
   let revenueChart = null;
   let statusChart = null;
   let autoRefreshInterval = null;
   let isAutoRefreshEnabled = true;
+  let refreshTimer = null;
 
   // Real-time polling using jQuery - fetches data every 10 seconds
   $(document).ready(function() {
+    updateRefreshIndicator('Up to date', false);
     startAutoRefresh();
   });
 
@@ -487,6 +544,8 @@
     
     autoRefreshInterval = setInterval(function() {
       if (!isAutoRefreshEnabled) return;
+
+      updateRefreshIndicator('Refreshing...', true);
       
       $.ajax({
         url: '/sales/api/sales-data',
@@ -497,9 +556,12 @@
           updateDashboardStats(data);
           renderCharts(data);
           renderRecentOrders(data.recentOrders || []);
+          updateRefreshIndicator('Updated just now', false);
+          updateRefreshTimestamp();
         },
         error: function(xhr, status, error) {
           console.warn('Auto-refresh failed:', error);
+          updateRefreshIndicator('Refresh failed', false);
         }
       });
     }, 10000); // 10 second interval
@@ -523,7 +585,22 @@
     }
   }
 
+  function updateRefreshIndicator(message, refreshing) {
+    $('#refresh-status-text').text(message);
+    $('#refresh-status').toggleClass('is-refreshing', Boolean(refreshing));
+  }
+
+  function updateRefreshTimestamp() {
+    $('#refresh-timestamp').text('Last updated: ' + new Date().toLocaleTimeString());
+    if (refreshTimer) clearTimeout(refreshTimer);
+
+    refreshTimer = setTimeout(function() {
+      $('#refresh-timestamp').text('Last updated: just now');
+    }, 2500);
+  }
+
   function manualRefresh() {
+    updateRefreshIndicator('Refreshing...', true);
     $.ajax({
       url: '/sales/api/sales-data',
       type: 'GET',
@@ -533,9 +610,12 @@
         updateDashboardStats(data);
         renderCharts(data);
         renderRecentOrders(data.recentOrders || []);
+        updateRefreshIndicator('Updated just now', false);
+        updateRefreshTimestamp();
       },
       error: function(xhr, status, error) {
         console.error('Manual refresh failed:', error);
+        updateRefreshIndicator('Refresh failed', false);
       }
     });
   }

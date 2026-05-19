@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Admin Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -26,24 +27,48 @@
               Monitor inventory and prepare product management workflows from one place.
             </p>
           </div>
-          <a class="admin-primary-link" href="/admin/products/new">Add product</a>
+          <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <span id="dashboard-refresh-status" style="display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:#f2efe8; font-size:12px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:#4a3d2a;">
+              <span style="width:8px; height:8px; border-radius:50%; background:currentColor; display:inline-block;"></span>
+              <span id="dashboard-refresh-text">Up to date</span>
+            </span>
+            <label style="display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:#5b4c3a;">
+              <input id="dashboard-auto-refresh" type="checkbox" checked />
+              Auto-refresh
+            </label>
+            <a class="admin-primary-link" href="/admin/products/new">Add product</a>
+          </div>
         </header>
 
         <section class="admin-stats" aria-label="Dashboard summary">
           <article class="stat-card">
             <span class="stat-label">Products</span>
-            <strong class="stat-value"><%= stats.productCount %></strong>
+            <strong class="stat-value" id="product-count"><%= stats.productCount %></strong>
           </article>
           <article class="stat-card">
             <span class="stat-label">Categories</span>
-            <strong class="stat-value"><%= stats.categoryCount %></strong>
+            <strong class="stat-value" id="category-count"><%= stats.categoryCount %></strong>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Total Revenue</span>
+            <strong class="stat-value" id="total-revenue">$<%= Number(stats.totalRevenue || 0).toFixed(2) %></strong>
+            <span class="stat-link-note">All-time order value</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Overall Sales</span>
+            <strong class="stat-value" id="total-orders"><%= stats.totalOrders %></strong>
+            <span class="stat-link-note"><span id="total-items-sold"><%= stats.totalItemsSold %></span> items sold</span>
           </article>
           <a class="stat-card stat-card-link" href="/admin/low-stock" aria-label="Open low stock items">
             <span class="stat-label">Low stock</span>
-            <strong class="stat-value"><%= stats.lowStockCount %></strong>
+            <strong class="stat-value" id="low-stock-count"><%= stats.lowStockCount %></strong>
             <span class="stat-link-note">View the items that need attention</span>
           </a>
         </section>
+
+        <div id="dashboard-refresh-timestamp" style="margin: -6px 0 18px; color:#6b5d49; font-size:13px; font-weight:600;">
+          Last updated: just now
+        </div>
 
         <section class="admin-panel">
           <div class="panel-heading">
@@ -144,5 +169,74 @@
         </section>
       </main>
     </div>
+
+    <script>
+      let dashboardRefreshInterval = null;
+      let dashboardRefreshTimeout = null;
+
+      $(document).ready(function() {
+        fetchDashboardData();
+        startDashboardAutoRefresh();
+
+        $('#dashboard-auto-refresh').on('change', function() {
+          if ($(this).is(':checked')) {
+            startDashboardAutoRefresh();
+          } else {
+            stopDashboardAutoRefresh();
+          }
+        });
+      });
+
+      function startDashboardAutoRefresh() {
+        stopDashboardAutoRefresh();
+        dashboardRefreshInterval = setInterval(fetchDashboardData, 10000);
+      }
+
+      function stopDashboardAutoRefresh() {
+        if (dashboardRefreshInterval) {
+          clearInterval(dashboardRefreshInterval);
+          dashboardRefreshInterval = null;
+        }
+      }
+
+      function setRefreshState(message, isRefreshing) {
+        $('#dashboard-refresh-text').text(message);
+        $('#dashboard-refresh-status').css({
+          background: isRefreshing ? '#1d160d' : '#f2efe8',
+          color: isRefreshing ? '#fff' : '#4a3d2a'
+        });
+      }
+
+      function updateRefreshTimestamp() {
+        $('#dashboard-refresh-timestamp').text('Last updated: ' + new Date().toLocaleTimeString());
+        if (dashboardRefreshTimeout) clearTimeout(dashboardRefreshTimeout);
+        dashboardRefreshTimeout = setTimeout(function() {
+          $('#dashboard-refresh-timestamp').text('Last updated: just now');
+        }, 2500);
+      }
+
+      function fetchDashboardData() {
+        setRefreshState('Refreshing...', true);
+
+        $.ajax({
+          url: '/admin/api/dashboard-data',
+          type: 'GET',
+          dataType: 'json',
+          success: function(data) {
+            $('#product-count').text(data.stats.productCount || 0);
+            $('#category-count').text(data.stats.categoryCount || 0);
+            $('#total-revenue').text('$' + Number(data.stats.totalRevenue || 0).toFixed(2));
+            $('#total-orders').text(data.stats.totalOrders || 0);
+            $('#total-items-sold').text(data.stats.totalItemsSold || 0);
+            $('#low-stock-count').text(data.stats.lowStockCount || 0);
+            setRefreshState('Updated just now', false);
+            updateRefreshTimestamp();
+          },
+          error: function() {
+            setRefreshState('Refresh failed', false);
+          }
+        });
+      }
+    </script>
   </body>
 </html>
