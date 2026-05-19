@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= mode === 'edit' ? 'Edit Product' : 'Add Product' %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body>
+    <div class="admin-shell">
+      <%- include('./partials/sidebar', { activePage: '' }) %>
+
+      <main class="admin-main">
+        <header class="admin-header">
+          <div>
+            <p class="admin-eyebrow"><%= mode === 'edit' ? 'Update entry' : 'Create entry' %></p>
+            <h1><%= mode === 'edit' ? 'Edit product' : 'Add new product' %></h1>
+            <p class="admin-summary">
+              Fill in the product details below. Required fields must be completed before saving.
+            </p>
+          </div>
+          <a class="admin-secondary-link" href="/admin">Back to dashboard</a>
+        </header>
+
+        <% if (errors && errors.length) { %>
+          <section class="form-alert" aria-live="polite">
+            <strong>Please fix the following:</strong>
+            <ul>
+              <% errors.forEach(function(error) { %>
+                <li><%= error %></li>
+              <% }) %>
+            </ul>
+          </section>
+        <% } %>
+
+        <section class="admin-panel">
+          <form class="admin-form" action="<%= formAction %>" method="post" enctype="multipart/form-data">
+            <div class="form-grid">
+              <label>
+                <span>Product name *</span>
+                <input type="text" name="name" value="<%= formData.name %>" />
+              </label>
+
+              <label>
+                <span>Price *</span>
+                <input type="number" name="price" step="0.01" min="0" value="<%= formData.price %>" />
+              </label>
+
+              <label>
+                <span>Stock *</span>
+                <input type="number" name="stock" min="0" value="<%= formData.stock %>" />
+              </label>
+
+              <label>
+                <span>Category *</span>
+                <select name="category">
+                  <option value="">Select category</option>
+                  <% (categories || []).forEach(function(category) { %>
+                    <option value="<%= category %>" <%= formData.category === category ? 'selected' : '' %>><%= category %></option>
+                  <% }) %>
+                </select>
+              </label>
+
+              <label class="form-span-2">
+                <span>Upload image</span>
+                <input type="file" name="imageFile" accept="image/*" />
+                <input type="hidden" name="currentImage" value="<%= formData.image %>" />
+                <small class="field-hint">
+                  <%= mode === 'edit' ? 'Choose a new file to replace the existing image.' : 'Upload a local image file for the product.' %>
+                </small>
+              </label>
+
+              <% if (typeof product !== 'undefined' && product && product.image) { %>
+                <label class="form-span-2">
+                  <span>Current image</span>
+                  <div class="image-preview">
+                    <img src="<%= product.image %>" alt="Current product image" />
+                  </div>
+                </label>
+              <% } %>
+
+              <label class="form-span-2">
+                <span>Description</span>
+                <textarea name="description" rows="5"><%= formData.description %></textarea>
+              </label>
+            </div>
+
+            <div class="form-actions">
+              <button class="admin-primary-button" type="submit">
+                <%= mode === 'edit' ? 'Save changes' : 'Create product' %>
+              </button>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
