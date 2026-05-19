@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Order Confirmation</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .confirmation-page {
+      max-width: 900px;
+      margin: 60px auto;
+      padding: 20px;
+    }
+
+    .confirmation-header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 30px;
+      background: #f0f8f0;
+      border-radius: 8px;
+      border: 2px solid #4caf50;
+    }
+
+    .confirmation-header h1 {
+      color: #4caf50;
+      margin-bottom: 10px;
+    }
+
+    .confirmation-header p {
+      font-size: 18px;
+      color: #333;
+    }
+
+    .confirmation-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 768px) {
+      .confirmation-details {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .detail-section {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #eee;
+    }
+
+    .detail-section h3 {
+      margin-bottom: 15px;
+      border-bottom: 2px solid #333;
+      padding-bottom: 10px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .order-items {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+
+    .order-items h3 {
+      margin-bottom: 20px;
+      border-bottom: 2px solid #333;
+      padding-bottom: 10px;
+    }
+
+    .order-item {
+      display: flex;
+      gap: 15px;
+      padding: 15px;
+      background: white;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+
+    .order-item img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+
+    .order-item-info {
+      flex: 1;
+    }
+
+    .order-item-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .order-item-price {
+      color: #666;
+      margin-bottom: 5px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .btn {
+      padding: 12px 30px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: #333;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #555;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+      border: 1px solid #ddd;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .order-status {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .order-status strong {
+      color: #856404;
+    }
+  </style>
+</head>
+<body>
+  <%- include('../partials/header') %>
+
+  <main class="confirmation-page">
+    <div class="confirmation-header">
+      <h1>✓ Order Confirmed!</h1>
+      <p>Thank you for your purchase. Your order has been successfully placed.</p>
+    </div>
+
+    <div class="order-status">
+      <strong>Order ID:</strong> <%= order._id %>
+    </div>
+
+    <div class="order-items">
+      <h3>Order Items</h3>
+      <% order.items.forEach(item => { %>
+        <div class="order-item">
+          <img src="<%= item.product.image || '/uploads/images/img1.png' %>" alt="<%= item.product.name %>" />
+          <div class="order-item-info">
+            <div class="order-item-name"><%= item.product.name %></div>
+            <div class="order-item-price">$<%= item.price.toFixed(2) %> each</div>
+            <div>Quantity: <%= item.quantity %></div>
+            <div style="color: #333; font-weight: bold;">Subtotal: $<%= (item.price * item.quantity).toFixed(2) %></div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+
+    <div class="confirmation-details">
+      <div class="detail-section">
+        <h3>Order Summary</h3>
+        <div class="detail-row">
+          <span>Total Amount:</span>
+          <strong>$<%= order.totalAmount.toFixed(2) %></strong>
+        </div>
+        <div class="detail-row">
+          <span>Order Status:</span>
+          <strong><%= order.status %></strong>
+        </div>
+        <div class="detail-row">
+          <span>Order Date:</span>
+          <span><%= new Date(order.createdAt).toLocaleDateString() %></span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h3>Shipping Address</h3>
+        <p><%= order.shippingAddress %></p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <a href="/products" class="btn btn-primary">Continue Shopping</a>
+      <a href="/checkout/my-orders" class="btn btn-secondary">View All Orders</a>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

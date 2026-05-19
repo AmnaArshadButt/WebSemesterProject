@@ -88,11 +88,15 @@ app.use('/categories', categoryRouter);
 app.use('/admin', adminRouter);
 app.use('/api/v1', apiV1Router);
 
-// Auth and checkout
+// Cart and Checkout routes
+const cartRouter = require('./routes/cart');
 const authRouter = require('./routes/auth');
 const checkoutRouter = require('./routes/checkout');
+const salesRouter = require('./routes/sales');
+app.use('/api/cart', cartRouter);
 app.use(authRouter);
 app.use('/checkout', checkoutRouter);
+app.use('/sales', salesRouter);
 
 // Simple error handler
 app.use((err, req, res, next) => {

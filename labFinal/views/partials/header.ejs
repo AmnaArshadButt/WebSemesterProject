@@ -12,6 +12,7 @@
 <div class="top-auth-bar">
   <div class="top-auth-links">
     <% if (currentUser) { %>
+      <a href="/checkout/my-orders">My Orders</a>
       <a href="/logout">Logout</a>
       <% if (currentUser.role === 'admin') { %>
         <a href="/admin">Admin Dashboard</a>
@@ -61,8 +62,51 @@
     <img class="nav-icons" src="/images/icons/search-svgrepo-com.svg" alt="Search" />
     <img class="nav-icons" src="/images/icons/heart-svgrepo-com.svg" alt="Wishlist" />
     <img class="nav-icons" src="/images/icons/user-svgrepo-com.svg" alt="User" />
-    <a class="nav-link" href="/checkout" aria-label="Checkout">
+    <a class="nav-link cart-link" href="/api/cart/view" aria-label="Checkout">
       <img class="nav-icons" src="/images/icons/bag.svg" alt="Cart" />
+      <span class="cart-badge" id="cart-count">0</span>
     </a>
   </div>
 </nav>
+
+<style>
+  .cart-link {
+    position: relative;
+  }
+  
+  .cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #e74c3c;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+  }
+</style>
+
+<script>
+  // Update cart count on page load and periodically
+  function updateCartCount() {
+    fetch('/api/cart')
+      .then(response => response.json())
+      .then(data => {
+        const badge = document.getElementById('cart-count');
+        if (badge) {
+          badge.textContent = data.totalItems || 0;
+        }
+      })
+      .catch(err => console.error('Error fetching cart:', err));
+  }
+
+  document.addEventListener('DOMContentLoaded', updateCartCount);
+  
+  // Re-update cart count every 10 seconds
+  setInterval(updateCartCount, 10000);
+</script>
