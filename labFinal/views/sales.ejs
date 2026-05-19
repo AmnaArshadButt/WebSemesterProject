@@ -468,29 +468,76 @@
   </section>
 </section>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script>
   const initialSalesData = <%- JSON.stringify(chartData) %>;
   let revenueChart = null;
   let statusChart = null;
+  let autoRefreshInterval = null;
+  let isAutoRefreshEnabled = true;
+
+  // Real-time polling using jQuery - fetches data every 10 seconds
+  $(document).ready(function() {
+    startAutoRefresh();
+  });
+
+  function startAutoRefresh() {
+    if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+    
+    autoRefreshInterval = setInterval(function() {
+      if (!isAutoRefreshEnabled) return;
+      
+      $.ajax({
+        url: '/sales/api/sales-data',
+        type: 'GET',
+        dataType: 'json',
+        timeout: 5000,
+        success: function(data) {
+          updateDashboardStats(data);
+          renderCharts(data);
+          renderRecentOrders(data.recentOrders || []);
+        },
+        error: function(xhr, status, error) {
+          console.warn('Auto-refresh failed:', error);
+        }
+      });
+    }, 10000); // 10 second interval
+  }
+
+  function stopAutoRefresh() {
+    if (autoRefreshInterval) {
+      clearInterval(autoRefreshInterval);
+      autoRefreshInterval = null;
+    }
+  }
+
+  function updateDashboardStats(data) {
+    $('#total-revenue').text('$' + Number(data.totalRevenue || 0).toFixed(2));
+    $('#total-orders').text(data.totalOrders || 0);
+    $('#average-order-value').text('$' + Number(data.averageOrderValue || 0).toFixed(2));
+
+    if (data.topProducts && data.topProducts.length) {
+      $('#top-product').text(data.topProducts[0].productName);
+      $('#top-product-units').text(data.topProducts[0].totalSold + ' units sold');
+    }
+  }
 
   function manualRefresh() {
-    fetch('/sales/api/sales-data')
-      .then(response => response.json())
-      .then(data => {
-        document.getElementById('total-revenue').textContent = '$' + Number(data.totalRevenue || 0).toFixed(2);
-        document.getElementById('total-orders').textContent = data.totalOrders || 0;
-        document.getElementById('average-order-value').textContent = '$' + Number(data.averageOrderValue || 0).toFixed(2);
-
-        if (data.topProducts && data.topProducts.length) {
-          document.getElementById('top-product').textContent = data.topProducts[0].productName;
-          document.getElementById('top-product-units').textContent = data.topProducts[0].totalSold + ' units sold';
-        }
-
+    $.ajax({
+      url: '/sales/api/sales-data',
+      type: 'GET',
+      dataType: 'json',
+      timeout: 5000,
+      success: function(data) {
+        updateDashboardStats(data);
         renderCharts(data);
         renderRecentOrders(data.recentOrders || []);
-      })
-      .catch(error => console.error('Failed to refresh sales data:', error));
+      },
+      error: function(xhr, status, error) {
+        console.error('Manual refresh failed:', error);
+      }
+    });
   }
 
   function renderCharts(data) {
@@ -544,27 +591,28 @@
   }
 
   function renderRecentOrders(recentOrders) {
-    const tbody = document.querySelector('#recent-orders-table tbody');
-    tbody.innerHTML = '';
+    const tbody = $('#recent-orders-table tbody');
+    tbody.empty();
 
     if (!recentOrders.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#7d6a52;">No recent orders</td></tr>';
+      tbody.html('<tr><td colspan="6" style="text-align:center;color:#7d6a52;">No recent orders</td></tr>');
       return;
     }
 
     recentOrders.forEach(order => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
+      const row = $('<tr></tr>');
+      row.html(`
         <td>${order.id}</td>
         <td>${order.user && order.user.name ? order.user.name : 'Guest'}</td>
         <td>${order.itemCount}</td>
         <td>$${Number(order.totalAmount || 0).toFixed(2)}</td>
         <td><span class="status-pill ${order.status}">${order.status}</span></td>
         <td>${new Date(order.createdAt).toLocaleDateString()}</td>
-      `;
-      tbody.appendChild(row);
+      `);
+      tbody.append(row);
     });
   }
 
+  // Initialize dashboard with initial data
   renderCharts(initialSalesData);
 </script>
