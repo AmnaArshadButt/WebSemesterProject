@@ -132,13 +132,18 @@ const getSalesData = async (req, res) => {
   try {
     const dashboardData = await buildSalesDashboardData();
 
-    res.json({
-      success: true,
-      ...dashboardData
-    });
+    res.json(dashboardData);
   } catch (err) {
     console.error('Error getting sales data:', err);
-    res.status(500).json({ error: 'Failed to get sales data' });
+    res.status(500).json({
+      totalRevenue: 0,
+      totalOrders: 0,
+      topProducts: [],
+      recentOrders: [],
+      dailyRevenue: [],
+      orderStatus: [],
+      averageOrderValue: 0
+    });
   }
 };
 

@@ -475,7 +475,7 @@
   let statusChart = null;
 
   function manualRefresh() {
-    fetch('/sales/api/data')
+    fetch('/sales/api/sales-data')
       .then(response => response.json())
       .then(data => {
         document.getElementById('total-revenue').textContent = '$' + Number(data.totalRevenue || 0).toFixed(2);

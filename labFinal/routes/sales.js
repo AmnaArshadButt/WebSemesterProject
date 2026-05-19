@@ -23,4 +23,7 @@ router.get('/', isLoggedIn, isAdmin, getSalesDashboard);
 // Sales data API (JSON)
 router.get('/api/data', isLoggedIn, isAdmin, getSalesData);
 
+// Secondary live update API route (strict JSON payload)
+router.get('/api/sales-data', isLoggedIn, isAdmin, getSalesData);
+
 module.exports = router;
