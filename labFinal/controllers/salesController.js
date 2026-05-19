@@ -5,9 +5,9 @@
 
 const Order = require('../models/Order');
 const Product = require('../models/Product');
+const Category = require('../models/category');
 
-// Get sales data for dashboard
-const getSalesData = async (req, res) => {
+const buildSalesDashboardData = async () => {
   try {
     // Total Revenue
     const revenueData = await Order.aggregate([
@@ -96,8 +96,7 @@ const getSalesData = async (req, res) => {
       orders: item.orders
     }));
 
-    res.json({
-      success: true,
+    return {
       totalRevenue: parseFloat(totalRevenue.toFixed(2)),
       totalOrders,
       topProducts,
@@ -113,6 +112,29 @@ const getSalesData = async (req, res) => {
       dailyRevenue: chartData,
       orderStatus,
       averageOrderValue: totalOrders > 0 ? parseFloat((totalRevenue / totalOrders).toFixed(2)) : 0
+    };
+  } catch (err) {
+    console.error('Error getting sales data:', err);
+    return {
+      totalRevenue: 0,
+      totalOrders: 0,
+      topProducts: [],
+      recentOrders: [],
+      dailyRevenue: [],
+      orderStatus: [],
+      averageOrderValue: 0
+    };
+  }
+};
+
+// Get sales data for dashboard API
+const getSalesData = async (req, res) => {
+  try {
+    const dashboardData = await buildSalesDashboardData();
+
+    res.json({
+      success: true,
+      ...dashboardData
     });
   } catch (err) {
     console.error('Error getting sales data:', err);
@@ -123,11 +145,21 @@ const getSalesData = async (req, res) => {
 // Render sales dashboard page
 const getSalesDashboard = async (req, res) => {
   try {
-    // Get initial data for server-side rendering
-    const initialData = await getSalesDataForView();
+    const initialData = await buildSalesDashboardData();
 
-    res.render('admin/sales-dashboard', {
+    let categories = [];
+    try {
+      const categoryDocs = await Category.find({}, { name: 1, _id: 0 }).sort({ name: 1 }).lean();
+      categories = categoryDocs.map((category) => category.name);
+    } catch (categoryErr) {
+      console.error('Error loading sales page categories:', categoryErr);
+    }
+
+    res.render('sales', {
+      layout: 'layout',
+      title: 'Sales Dashboard',
       initialData,
+      categories,
       activePage: 'sales'
     });
   } catch (err) {
@@ -136,55 +168,8 @@ const getSalesDashboard = async (req, res) => {
   }
 };
 
-// Helper function to get sales data (reusable)
-const getSalesDataForView = async () => {
-  try {
-    const revenueData = await Order.aggregate([
-      {
-        $group: {
-          _id: null,
-          totalRevenue: { $sum: '$totalAmount' },
-          totalOrders: { $sum: 1 }
-        }
-      }
-    ]);
-
-    const totalRevenue = revenueData[0]?.totalRevenue || 0;
-    const totalOrders = revenueData[0]?.totalOrders || 0;
-
-    const topProducts = await Order.aggregate([
-      { $unwind: '$items' },
-      {
-        $group: {
-          _id: '$items.product',
-          totalSold: { $sum: '$items.quantity' },
-          productName: { $first: '$items.name' },
-          totalRevenue: { $sum: { $multiply: ['$items.price', '$items.quantity'] } }
-        }
-      },
-      { $sort: { totalSold: -1 } },
-      { $limit: 5 }
-    ]);
-
-    return {
-      totalRevenue: parseFloat(totalRevenue.toFixed(2)),
-      totalOrders,
-      topProducts,
-      averageOrderValue: totalOrders > 0 ? parseFloat((totalRevenue / totalOrders).toFixed(2)) : 0
-    };
-  } catch (err) {
-    console.error('Error in getSalesDataForView:', err);
-    return {
-      totalRevenue: 0,
-      totalOrders: 0,
-      topProducts: [],
-      averageOrderValue: 0
-    };
-  }
-};
-
 module.exports = {
   getSalesData,
   getSalesDashboard,
-  getSalesDataForView
+  buildSalesDashboardData
 };

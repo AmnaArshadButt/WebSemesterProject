@@ -1,0 +1,570 @@
+<% const topProduct = initialData.topProducts && initialData.topProducts.length ? initialData.topProducts[0] : null; %>
+<% const chartData = { dailyRevenue: initialData.dailyRevenue || [], orderStatus: initialData.orderStatus || [] }; %>
+
+<style>
+  .sales-page {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 44px 20px 28px;
+  }
+
+  .sales-page::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(circle at top left, rgba(29, 22, 13, 0.08), transparent 35%),
+      linear-gradient(180deg, #f8f2e8 0%, #fffaf3 48%, #f4ede2 100%);
+  }
+
+  .sales-hero {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 24px;
+    align-items: end;
+    margin-bottom: 28px;
+  }
+
+  .sales-kicker {
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 12px;
+    color: #8a6d3b;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+
+  .sales-hero h1 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    margin: 0 0 12px;
+  }
+
+  .sales-hero p {
+    max-width: 62ch;
+    color: #5d5448;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .sales-panel {
+    background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248,242,232,0.95));
+    border: 1px solid rgba(90, 68, 35, 0.12);
+    border-radius: 24px;
+    padding: 22px;
+    box-shadow: 0 20px 50px rgba(56, 44, 25, 0.08);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sales-panel::after {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: rgba(29, 22, 13, 0.05);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(90, 68, 35, 0.1);
+    border-radius: 20px;
+    padding: 22px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 12px 28px rgba(56, 44, 25, 0.05);
+  }
+
+  .stat-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: #8a6d3b;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .stat-value {
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+    font-weight: 700;
+    color: #1d160d;
+    line-height: 1;
+  }
+
+  .stat-meta {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #6f6557;
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 22px;
+    margin-bottom: 22px;
+  }
+
+  .card-section {
+    background: rgba(255,255,255,0.96);
+    border-radius: 24px;
+    padding: 22px;
+    border: 1px solid rgba(90, 68, 35, 0.1);
+    box-shadow: 0 14px 30px rgba(56, 44, 25, 0.06);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+
+  .card-header h2 {
+    font-size: 20px;
+    margin: 0;
+  }
+
+  .revenue-list,
+  .status-list {
+    display: grid;
+    gap: 10px;
+  }
+
+  .mini-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: #faf7f2;
+    color: #3e3324;
+  }
+
+  .mini-row span:last-child {
+    font-weight: 700;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  table.sales-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .sales-table th,
+  .sales-table td {
+    text-align: left;
+    padding: 14px 12px;
+    border-bottom: 1px solid #eee5d8;
+    font-size: 14px;
+    vertical-align: top;
+  }
+
+  .sales-table th {
+    color: #7d6a52;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: capitalize;
+    background: #f5ede0;
+    color: #6d5531;
+  }
+
+  .status-pill.confirmed,
+  .status-pill.delivered {
+    background: #e6f5e8;
+    color: #246b34;
+  }
+
+  .status-pill.shipped {
+    background: #e7f1ff;
+    color: #245a91;
+  }
+
+  .chart-box {
+    margin-top: 12px;
+    min-height: 280px;
+  }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .refresh-btn {
+    border: 0;
+    border-radius: 999px;
+    padding: 10px 14px;
+    background: #1d160d;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .refresh-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(29, 22, 13, 0.2);
+  }
+
+  .eyebrow-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(29, 22, 13, 0.08);
+    color: #1d160d;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .sales-hero .hero-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+  }
+
+  .hero-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 700;
+    border: 1px solid rgba(29, 22, 13, 0.14);
+    color: #1d160d;
+    background: rgba(255,255,255,0.65);
+  }
+
+  .hero-link.primary {
+    background: #1d160d;
+    color: #fff;
+    border-color: #1d160d;
+  }
+
+  .hero-link:hover {
+    transform: translateY(-1px);
+  }
+
+  .insight-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin: 18px 0 28px;
+  }
+
+  .insight-card {
+    background: rgba(29, 22, 13, 0.94);
+    color: #fff;
+    border-radius: 18px;
+    padding: 16px 18px;
+    box-shadow: 0 16px 34px rgba(29, 22, 13, 0.18);
+  }
+
+  .insight-card small {
+    display: block;
+    color: rgba(255,255,255,0.72);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+
+  .insight-card strong {
+    font-size: 28px;
+    line-height: 1;
+  }
+
+  @media (max-width: 1024px) {
+    .stats-grid,
+    .sales-hero,
+    .insight-strip,
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<section class="sales-page">
+  <div class="sales-hero">
+    <div>
+      <div class="eyebrow-chip">Admin analytics</div>
+      <div class="sales-kicker">Sales Dashboard</div>
+      <h1>Live sales overview</h1>
+      <p>
+        This page is rendered on the server first, so the initial metrics, revenue trend, and recent orders appear immediately before any client-side refresh runs.
+      </p>
+      <div class="hero-actions">
+        <a class="hero-link primary" href="/admin">Back to admin</a>
+        <a class="hero-link" href="/admin/low-stock">Check low stock</a>
+      </div>
+    </div>
+    <div class="sales-panel">
+      <div class="stat-label">Current snapshot</div>
+      <div class="stat-value">$<%= initialData.totalRevenue.toFixed(2) %></div>
+      <div class="stat-meta"><%= initialData.totalOrders %> orders placed, average order value $<%= initialData.averageOrderValue.toFixed(2) %></div>
+    </div>
+  </div>
+
+  <div class="insight-strip">
+    <div class="insight-card">
+      <small>Revenue</small>
+      <strong>$<%= initialData.totalRevenue.toFixed(0) %></strong>
+    </div>
+    <div class="insight-card">
+      <small>Orders</small>
+      <strong><%= initialData.totalOrders %></strong>
+    </div>
+    <div class="insight-card">
+      <small>Top product</small>
+      <strong><%= topProduct ? topProduct.productName : '-' %></strong>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <article class="stat-card">
+      <div class="stat-label">Total Revenue</div>
+      <div class="stat-value" id="total-revenue">$<%= initialData.totalRevenue.toFixed(2) %></div>
+      <div class="stat-meta">All-time sales total</div>
+    </article>
+    <article class="stat-card">
+      <div class="stat-label">Total Orders</div>
+      <div class="stat-value" id="total-orders"><%= initialData.totalOrders %></div>
+      <div class="stat-meta">Completed and pending orders</div>
+    </article>
+    <article class="stat-card">
+      <div class="stat-label">Average Order Value</div>
+      <div class="stat-value" id="average-order-value">$<%= initialData.averageOrderValue.toFixed(2) %></div>
+      <div class="stat-meta">Revenue divided by order count</div>
+    </article>
+    <article class="stat-card">
+      <div class="stat-label">Top Product</div>
+      <div class="stat-value" id="top-product" style="font-size: 1.2rem;"><%= topProduct ? topProduct.productName : '-' %></div>
+      <div class="stat-meta" id="top-product-units"><%= topProduct ? `${topProduct.totalSold} units sold` : '-' %></div>
+    </article>
+  </div>
+
+  <div class="dashboard-grid">
+    <section class="card-section">
+      <div class="card-header">
+        <h2>Revenue Trend</h2>
+        <div class="toolbar">
+          <button class="refresh-btn" type="button" onclick="manualRefresh()">Refresh</button>
+        </div>
+      </div>
+      <div class="chart-box">
+        <canvas id="revenueChart"></canvas>
+      </div>
+      <div class="revenue-list" style="margin-top: 18px;">
+        <% (initialData.dailyRevenue || []).slice(-5).forEach(point => { %>
+          <div class="mini-row">
+            <span><%= point.date %></span>
+            <span>$<%= point.revenue.toFixed(2) %></span>
+          </div>
+        <% }); %>
+      </div>
+    </section>
+
+    <section class="card-section">
+      <div class="card-header">
+        <h2>Order Status</h2>
+      </div>
+      <div class="chart-box">
+        <canvas id="statusChart"></canvas>
+      </div>
+      <div class="status-list" style="margin-top: 18px;">
+        <% (initialData.orderStatus || []).forEach(item => { %>
+          <div class="mini-row">
+            <span><%= item._id %></span>
+            <span><%= item.count %></span>
+          </div>
+        <% }); %>
+      </div>
+    </section>
+  </div>
+
+  <section class="card-section" style="margin-bottom: 22px;">
+    <div class="card-header">
+      <h2>Top Selling Products</h2>
+    </div>
+    <div class="table-wrap">
+      <table class="sales-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Units Sold</th>
+            <th>Revenue</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% (initialData.topProducts || []).forEach(product => { %>
+            <tr>
+              <td><%= product.productName %></td>
+              <td><%= product.totalSold %></td>
+              <td>$<%= product.totalRevenue.toFixed(2) %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card-section">
+    <div class="card-header">
+      <h2>Recent Orders</h2>
+    </div>
+    <div class="table-wrap">
+      <table class="sales-table" id="recent-orders-table">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Customer</th>
+            <th>Items</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% (initialData.recentOrders || []).forEach(order => { %>
+            <tr>
+              <td><%= order.id %></td>
+              <td><%= order.user && order.user.name ? order.user.name : 'Guest' %></td>
+              <td><%= order.itemCount %></td>
+              <td>$<%= order.totalAmount.toFixed(2) %></td>
+              <td><span class="status-pill <%= order.status %>"><%= order.status %></span></td>
+              <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+  const initialSalesData = <%- JSON.stringify(chartData) %>;
+  let revenueChart = null;
+  let statusChart = null;
+
+  function manualRefresh() {
+    fetch('/sales/api/data')
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('total-revenue').textContent = '$' + Number(data.totalRevenue || 0).toFixed(2);
+        document.getElementById('total-orders').textContent = data.totalOrders || 0;
+        document.getElementById('average-order-value').textContent = '$' + Number(data.averageOrderValue || 0).toFixed(2);
+
+        if (data.topProducts && data.topProducts.length) {
+          document.getElementById('top-product').textContent = data.topProducts[0].productName;
+          document.getElementById('top-product-units').textContent = data.topProducts[0].totalSold + ' units sold';
+        }
+
+        renderCharts(data);
+        renderRecentOrders(data.recentOrders || []);
+      })
+      .catch(error => console.error('Failed to refresh sales data:', error));
+  }
+
+  function renderCharts(data) {
+    const revenuePoints = (data.dailyRevenue || []).map(point => point.revenue);
+    const revenueLabels = (data.dailyRevenue || []).map(point => point.date);
+    const statusLabels = (data.orderStatus || []).map(point => point._id);
+    const statusCounts = (data.orderStatus || []).map(point => point.count);
+
+    const revenueCtx = document.getElementById('revenueChart');
+    const statusCtx = document.getElementById('statusChart');
+
+    if (revenueChart) {
+      revenueChart.data.labels = revenueLabels;
+      revenueChart.data.datasets[0].data = revenuePoints;
+      revenueChart.update();
+    } else {
+      revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+          labels: revenueLabels,
+          datasets: [{
+            label: 'Revenue',
+            data: revenuePoints,
+            borderColor: '#1d160d',
+            backgroundColor: 'rgba(29, 22, 13, 0.1)',
+            fill: true,
+            tension: 0.35
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+    }
+
+    if (statusChart) {
+      statusChart.data.labels = statusLabels;
+      statusChart.data.datasets[0].data = statusCounts;
+      statusChart.update();
+    } else {
+      statusChart = new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+          labels: statusLabels,
+          datasets: [{
+            data: statusCounts,
+            backgroundColor: ['#f6d7a7', '#d7e8f6', '#d9f0dc', '#efe1f6', '#f8d7da']
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+    }
+  }
+
+  function renderRecentOrders(recentOrders) {
+    const tbody = document.querySelector('#recent-orders-table tbody');
+    tbody.innerHTML = '';
+
+    if (!recentOrders.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#7d6a52;">No recent orders</td></tr>';
+      return;
+    }
+
+    recentOrders.forEach(order => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${order.id}</td>
+        <td>${order.user && order.user.name ? order.user.name : 'Guest'}</td>
+        <td>${order.itemCount}</td>
+        <td>$${Number(order.totalAmount || 0).toFixed(2)}</td>
+        <td><span class="status-pill ${order.status}">${order.status}</span></td>
+        <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  renderCharts(initialSalesData);
+</script>

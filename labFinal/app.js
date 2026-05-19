@@ -9,6 +9,7 @@ const path = require('path');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
+const expressLayouts = require('express-ejs-layouts');
 
 // Load environment variables from .env
 require('dotenv').config();
@@ -28,6 +29,8 @@ connectDB();
 // View engine and static assets
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.use(expressLayouts);
+app.set('layout', false);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Request body parsers

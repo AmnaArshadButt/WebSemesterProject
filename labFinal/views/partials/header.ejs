@@ -1,5 +1,6 @@
 <!-- Flash messages -->
 <% const navCategories = typeof categories !== 'undefined' ? categories : []; %>
+<% const isAdminUser = currentUser && currentUser.role === 'admin'; %>
 <div class="flash-container">
   <% if (success && success.length) { %>
     <div class="flash flash-success"><%= success[0] %></div>
@@ -9,104 +10,166 @@
   <% } %>
 </div>
 
-<div class="top-auth-bar">
-  <div class="top-auth-links">
-    <% if (currentUser) { %>
-      <a href="/checkout/my-orders">My Orders</a>
-      <a href="/logout">Logout</a>
-      <% if (currentUser.role === 'admin') { %>
-        <a href="/admin">Admin Dashboard</a>
+<% if (isAdminUser) { %>
+  <header class="admin-topbar">
+    <div class="admin-topbar-inner">
+      <div>
+        <p class="admin-topbar-kicker">Admin area</p>
+        <strong>Store Management</strong>
+      </div>
+      <nav class="admin-topbar-links" aria-label="Admin shortcuts">
+        <a href="/admin">Dashboard</a>
+        <a href="/sales">Sales</a>
+        <a href="/admin/products-view">Products</a>
+        <a href="/admin/categories">Categories</a>
+        <a href="/logout">Logout</a>
+      </nav>
+    </div>
+  </header>
+  <style>
+    .admin-topbar {
+      background: #1d160d;
+      color: #fff;
+      padding: 14px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .admin-topbar-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .admin-topbar-kicker {
+      margin: 0 0 4px;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #c9b08d;
+    }
+
+    .admin-topbar-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .admin-topbar-links a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .admin-topbar-links a:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+  </style>
+<% } else { %>
+  <div class="top-auth-bar">
+    <div class="top-auth-links">
+      <% if (currentUser) { %>
+        <a href="/checkout/my-orders">My Orders</a>
+        <a href="/logout">Logout</a>
+        <% if (currentUser.role === 'admin') { %>
+          <a href="/admin">Admin Dashboard</a>
+        <% } %>
+      <% } else { %>
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
       <% } %>
-    <% } else { %>
-      <a href="/login">Login</a>
-      <a href="/register">Register</a>
-    <% } %>
-  </div>
-</div>
-
-<nav class="nav-bar">
-  <button class="menu-toggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
-
-  <div class="divlogo">
-    <a href="/">
-      <img class="logo-img" src="/images/icons/logo.svg" alt="Logo" />
-    </a>
+    </div>
   </div>
 
-  <div class="nav-menu">
-    <ul class="nav-list">
-      <li class="nav-list-item"><a href="#">NEW IN</a></li>
-      <li class="nav-list-item2"><a href="#"><strong>FROM RAMADAN TO EID</strong></a></li>
-      <li class="nav-list-item"><a href="#">READY TO WEAR</a></li>
-      <li class="nav-list-item"><a href="#">FABRICS</a></li>
-      <li class="nav-list-item"><a href="#">FRAGNANCES</a></li>
-      <li class="nav-list-item shop-item"><a href="/products"><strong>SHOP</strong></a>
-        <div class="shop-dropdown">
-          <ul>
-            <% navCategories.forEach(function(cat) { %>
-              <li><a href="/products?category=<%= encodeURIComponent(cat) %>"><%= cat %></a></li>
-            <% }) %>
-          </ul>
-        </div>
-      </li>
-      <li class="nav-list-item6"><a href="#">SALES</a></li>
-      <li class="nav-list-item"><a href="#"><strong>NOW HAPPENING</strong></a></li>
-    </ul>
-  </div>
+  <nav class="nav-bar">
+    <button class="menu-toggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
 
-  <div class="navdiv-icons">
-    <img class="nav-icons" src="/images/icons/search-svgrepo-com.svg" alt="Search" />
-    <img class="nav-icons" src="/images/icons/heart-svgrepo-com.svg" alt="Wishlist" />
-    <img class="nav-icons" src="/images/icons/user-svgrepo-com.svg" alt="User" />
-    <a class="nav-link cart-link" href="/api/cart/view" aria-label="Checkout">
-      <img class="nav-icons" src="/images/icons/bag.svg" alt="Cart" />
-      <span class="cart-badge" id="cart-count">0</span>
-    </a>
-  </div>
-</nav>
+    <div class="divlogo">
+      <a href="/">
+        <img class="logo-img" src="/images/icons/logo.svg" alt="Logo" />
+      </a>
+    </div>
 
-<style>
-  .cart-link {
-    position: relative;
-  }
-  
-  .cart-badge {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #e74c3c;
-    color: white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: bold;
-  }
-</style>
+    <div class="nav-menu">
+      <ul class="nav-list">
+        <li class="nav-list-item"><a href="#">NEW IN</a></li>
+        <li class="nav-list-item2"><a href="#"><strong>FROM RAMADAN TO EID</strong></a></li>
+        <li class="nav-list-item"><a href="#">READY TO WEAR</a></li>
+        <li class="nav-list-item"><a href="#">FABRICS</a></li>
+        <li class="nav-list-item"><a href="#">FRAGNANCES</a></li>
+        <li class="nav-list-item shop-item"><a href="/products"><strong>SHOP</strong></a>
+          <div class="shop-dropdown">
+            <ul>
+              <% navCategories.forEach(function(cat) { %>
+                <li><a href="/products?category=<%= encodeURIComponent(cat) %>"><%= cat %></a></li>
+              <% }) %>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-list-item6"><a href="/sales">SALES</a></li>
+        <li class="nav-list-item"><a href="#"><strong>NOW HAPPENING</strong></a></li>
+      </ul>
+    </div>
 
-<script>
-  // Update cart count on page load and periodically
-  function updateCartCount() {
-    fetch('/api/cart')
-      .then(response => response.json())
-      .then(data => {
-        const badge = document.getElementById('cart-count');
-        if (badge) {
-          badge.textContent = data.totalItems || 0;
-        }
-      })
-      .catch(err => console.error('Error fetching cart:', err));
-  }
+    <div class="navdiv-icons">
+      <img class="nav-icons" src="/images/icons/search-svgrepo-com.svg" alt="Search" />
+      <img class="nav-icons" src="/images/icons/heart-svgrepo-com.svg" alt="Wishlist" />
+      <img class="nav-icons" src="/images/icons/user-svgrepo-com.svg" alt="User" />
+      <a class="nav-link cart-link" href="/api/cart/view" aria-label="Checkout">
+        <img class="nav-icons" src="/images/icons/bag.svg" alt="Cart" />
+        <span class="cart-badge" id="cart-count">0</span>
+      </a>
+    </div>
+  </nav>
 
-  document.addEventListener('DOMContentLoaded', updateCartCount);
-  
-  // Re-update cart count every 10 seconds
-  setInterval(updateCartCount, 10000);
-</script>
+  <style>
+    .cart-link {
+      position: relative;
+    }
+    
+    .cart-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #e74c3c;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+  </style>
+
+  <script>
+    // Update cart count on page load and periodically
+    function updateCartCount() {
+      fetch('/api/cart')
+        .then(response => response.json())
+        .then(data => {
+          const badge = document.getElementById('cart-count');
+          if (badge) {
+            badge.textContent = data.totalItems || 0;
+          }
+        })
+        .catch(err => console.error('Error fetching cart:', err));
+    }
+
+    document.addEventListener('DOMContentLoaded', updateCartCount);
+    
+    // Re-update cart count every 10 seconds
+    setInterval(updateCartCount, 10000);
+  </script>
+<% } %>
